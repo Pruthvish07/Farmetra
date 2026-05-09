@@ -11,7 +11,7 @@ interface DiagnosisResultProps {
 
 export default function DiagnosisResult({ diagnosis, onClose }: DiagnosisResultProps) {
   return (
-    <div className="fixed inset-0 bg-[#F4F9F4] z-[110] flex flex-col md:flex-row overflow-hidden font-sans">
+    <div className="fixed inset-0 bg-[#F4F9F4] dark:bg-[#0A0F0D] z-[110] flex flex-col md:flex-row overflow-hidden font-sans transition-colors">
       {/* Visual Side */}
       <div className="h-[40vh] md:h-full md:w-1/2 relative shrink-0">
         <img src={diagnosis.imageUrl} className="w-full h-full object-cover md:rounded-r-[48px]" />
@@ -47,10 +47,10 @@ export default function DiagnosisResult({ diagnosis, onClose }: DiagnosisResultP
       </div>
 
       {/* Data Side */}
-      <div className="flex-1 overflow-y-auto p-6 md:p-12 space-y-10 md:bg-white md:m-6 md:rounded-[48px] shadow-2xl border border-emerald-50">
+      <div className="flex-1 overflow-y-auto p-6 md:p-12 space-y-10 md:bg-white dark:md:bg-white/5 md:m-6 md:rounded-[48px] shadow-2xl border border-emerald-50 dark:border-white/10 transition-colors">
         <div className="flex flex-col md:flex-row gap-6 justify-between items-start">
           <div className="space-y-1">
-            <h3 className="text-emerald-900 text-2xl font-black tracking-tighter uppercase">AI Diagnostic Report</h3>
+            <h3 className="text-emerald-500 dark:text-white text-2xl font-black tracking-tighter uppercase">AI Diagnostic Report</h3>
             <p className="text-slate-400 text-xs font-bold uppercase tracking-[0.2em]">{new Date(diagnosis.timestamp).toLocaleString()} • REF: {diagnosis.id.toUpperCase()}</p>
           </div>
           
@@ -100,7 +100,7 @@ export default function DiagnosisResult({ diagnosis, onClose }: DiagnosisResultP
         <section className="space-y-4">
           <div className="flex items-center gap-3 text-emerald-800">
             <AlertCircle size={20} />
-            <h3 className="font-black uppercase tracking-widest text-xs">Integrated Farm Management</h3>
+            <h3 className="font-black uppercase tracking-widest text-xs text-slate-900 dark:text-white">Integrated Farm Management</h3>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {diagnosis.preventiveMeasures.map((measure, i) => (

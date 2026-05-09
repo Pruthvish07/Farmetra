@@ -47,7 +47,7 @@ export default function App() {
       case 'history':
         return (
           <div className="p-6 pb-24">
-            <h2 className="text-2xl font-black tracking-tighter mb-6 uppercase">Pathogen Registry</h2>
+            <h2 className="text-2xl font-black tracking-tighter mb-6 uppercase text-emerald-500 dark:text-white">Pathogen Registry</h2>
             <div className="space-y-4">
               {diagnosisHistory.length > 0 ? (
                 diagnosisHistory.map((report) => (
@@ -79,7 +79,7 @@ export default function App() {
               <div className="w-24 h-24 rounded-full bg-emerald-600 flex items-center justify-center text-white text-3xl font-black mb-6 ring-8 ring-emerald-50 dark:ring-emerald-900/20 shadow-xl">
                 {USER_NAME.split(' ').map(n => n[0]).join('').substring(0, 2)}
               </div>
-              <h2 className="text-2xl font-black text-emerald-900 dark:text-white tracking-tighter uppercase">{USER_NAME}</h2>
+              <h2 className="text-2xl font-black text-emerald-500 dark:text-white tracking-tighter uppercase">{USER_NAME}</h2>
               <p className="text-xs font-bold text-emerald-600 uppercase tracking-[0.2em] mt-1">System Administrator</p>
               <div className="mt-6 flex gap-3">
                  <span className="bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 px-3 py-1 rounded-full text-[10px] font-black border border-emerald-100 dark:border-emerald-500/20">LEVEL 4 CLEARANCE</span>

@@ -18,7 +18,7 @@ export default function Dashboard({ recentReports, onViewReport, onLaunchCamera,
       {/* Hero Section */}
       <section className="md:col-span-8 bg-white dark:bg-white/5 rounded-[32px] p-8 shadow-sm border border-emerald-50 dark:border-white/10 relative overflow-hidden flex flex-col justify-center min-h-[280px] transition-colors">
         <div className="relative z-10">
-          <h2 className="text-3xl md:text-4xl font-black text-emerald-900 dark:text-white mb-2 tracking-tighter uppercase">Diagnostic Engine</h2>
+          <h2 style={{ color: '#83f369', borderColor: '#0cef0e' }} className="text-3xl md:text-4xl font-black mb-2 tracking-tighter uppercase">Diagnostic Engine</h2>
           <p className="text-emerald-700 dark:text-emerald-400 font-medium mb-8 max-w-md text-sm md:text-base opacity-80 uppercase tracking-widest text-[10px]">
             CNN Pathogen Detection v4.2 • Secure Offline Analysis
           </p>
@@ -39,7 +39,7 @@ export default function Dashboard({ recentReports, onViewReport, onLaunchCamera,
              </div>
              <div>
                <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">SENSORS</p>
-               <p className="text-xs font-bold dark:text-white">Active</p>
+               <p style={{ color: '#070505' }} className="text-xs font-bold dark:text-white">Active</p>
              </div>
            </div>
         </div>
@@ -74,7 +74,7 @@ export default function Dashboard({ recentReports, onViewReport, onLaunchCamera,
       <section className="md:col-span-12 bg-white dark:bg-white/5 rounded-[40px] p-10 shadow-sm border border-emerald-50 dark:border-white/10 flex flex-col transition-colors">
         <div className="flex justify-between items-center mb-10">
           <div className="space-y-1">
-             <h3 className="font-black text-emerald-950 dark:text-white text-xl uppercase tracking-tighter">Diagnostic Registry</h3>
+             <h3 className="font-black text-emerald-500 dark:text-white text-xl uppercase tracking-tighter">Diagnostic Registry</h3>
              <p className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Active local sync</p>
           </div>
         </div>
@@ -113,4 +113,3 @@ export default function Dashboard({ recentReports, onViewReport, onLaunchCamera,
     </div>
   );
 }
-;

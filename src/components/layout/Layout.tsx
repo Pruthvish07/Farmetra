@@ -57,7 +57,7 @@ export default function Layout({ children, activeTab, onTabChange, isDarkMode, o
           </div>
           <h1 className={cn(
             "text-2xl font-black tracking-tight",
-            isDarkMode ? "text-white" : "text-emerald-900"
+            isDarkMode ? "text-white" : "text-emerald-500"
           )}>Farmetra</h1>
         </div>
         
@@ -150,7 +150,7 @@ export default function Layout({ children, activeTab, onTabChange, isDarkMode, o
              </div>
              <h1 className={cn(
                "text-xl font-black tracking-tighter",
-               isDarkMode ? "text-white" : "text-emerald-900"
+               isDarkMode ? "text-white" : "text-emerald-500"
              )}>Farmetra</h1>
           </div>
 

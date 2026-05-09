@@ -57,7 +57,7 @@ export default function Gallery() {
     <div className="p-6 md:p-12 space-y-10">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div className="space-y-2">
-          <h2 className="text-3xl md:text-5xl font-black tracking-tighter uppercase text-emerald-900 dark:text-white">Disease Library</h2>
+          <h2 className="text-3xl md:text-5xl font-black tracking-tighter uppercase text-emerald-500 dark:text-white">Disease Library</h2>
           <p className="text-emerald-700 dark:text-emerald-400 font-bold uppercase tracking-[0.2em] text-[10px]">Reference database for field pathogen identification</p>
         </div>
         
@@ -108,7 +108,7 @@ export default function Gallery() {
             
             <div className="p-8 space-y-4">
               <div>
-                <h4 className="text-xl font-black text-emerald-950 dark:text-white uppercase tracking-tighter leading-none">{disease.name}</h4>
+                <h4 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tighter leading-none">{disease.name}</h4>
                 <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest mt-1">Found in {disease.crop}</p>
               </div>
               <p className="text-xs text-slate-500 font-medium leading-relaxed line-clamp-3">
