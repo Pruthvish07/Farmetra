@@ -4,6 +4,7 @@ import { analyzeCropImage } from '../../services/aiService';
 import { Diagnosis } from '../../types';
 import { cn } from '../../lib/utils';
 import { motion, AnimatePresence } from 'motion/react';
+import { resizeImage } from '../../lib/imageUtils';
 
 interface CameraScreenProps {
   onDiagnosisComplete: (diagnosis: Diagnosis) => void;
@@ -43,31 +44,66 @@ export default function CameraScreen({ onDiagnosisComplete, onCancel }: CameraSc
     }
   };
 
-  const capturePhoto = () => {
+  const capturePhoto = async () => {
     if (videoRef.current && canvasRef.current) {
       const canvas = canvasRef.current;
       const video = videoRef.current;
+      
+      // Ensure video is ready
+      if (video.videoWidth === 0 || video.videoHeight === 0) {
+        setError("Camera not ready. Please wait a moment.");
+        return;
+      }
+
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
       const ctx = canvas.getContext('2d');
       if (ctx) {
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-        const dataUrl = canvas.toDataURL('image/jpeg');
-        setCapturedImage(dataUrl);
-        handleAnalysis(dataUrl);
+        const rawDataUrl = canvas.toDataURL('image/jpeg', 0.9);
+        
+        if (!rawDataUrl.includes(';base64,') || rawDataUrl.length < 1000) {
+          setError("Failed to capture valid image frame.");
+          return;
+        }
+
+        try {
+          setIsAnalyzing(true);
+          const compressedImage = await resizeImage(rawDataUrl);
+          setCapturedImage(compressedImage);
+          handleAnalysis(compressedImage);
+        } catch (err) {
+          console.error("Compression error:", err);
+          handleAnalysis(rawDataUrl); // Fallback to raw if compression fails
+        }
       }
     }
   };
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onload = (event) => {
-      const dataUrl = event.target?.result as string;
-      setCapturedImage(dataUrl);
-      handleAnalysis(dataUrl);
+    reader.onload = async (event) => {
+      const rawDataUrl = event.target?.result as string;
+      
+      if (!rawDataUrl.includes(';base64,') || rawDataUrl.length < 500) {
+        setError("Invalid or empty image file.");
+        setIsAnalyzing(false);
+        return;
+      }
+
+      try {
+        setIsAnalyzing(true);
+        const compressedImage = await resizeImage(rawDataUrl);
+        setCapturedImage(compressedImage);
+        handleAnalysis(compressedImage);
+      } catch (err) {
+        console.error("Compression error:", err);
+        setCapturedImage(rawDataUrl);
+        handleAnalysis(rawDataUrl); // Fallback to raw
+      }
     };
     reader.readAsDataURL(file);
   };
@@ -78,10 +114,11 @@ export default function CameraScreen({ onDiagnosisComplete, onCancel }: CameraSc
     try {
       const result = await analyzeCropImage(imageData);
       onDiagnosisComplete(result);
-    } catch (err) {
+    } catch (err: any) {
       console.error("AI Analysis Error:", err);
-      setError("AI analysis failed. Please try a different photo.");
-      setCapturedImage(null);
+      const message = err.message || "AI analysis failed. Please try a different photo.";
+      setError(`DIAGNOSIS FAILED: ${message}`);
+      // Do NOT setCapturedImage(null) - keep the image so user can see it
     } finally {
       setIsAnalyzing(false);
     }

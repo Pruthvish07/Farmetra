@@ -115,7 +115,7 @@ export default function Layout({ children, activeTab, onTabChange, isDarkMode, o
               <div className="w-8 h-8 rounded-full bg-emerald-400 flex items-center justify-center text-emerald-900 font-bold text-xs uppercase">
                 {USER_NAME.split(' ').map(n => n[0]).join('').substring(0, 2)}
               </div>
-              <p className="text-xs font-bold truncate">{USER_NAME}</p>
+              <p className="text-xs font-bold truncate text-[#f7f8fb]">{USER_NAME}</p>
             </div>
             <p className="text-[9px] text-emerald-300 font-medium opacity-80 uppercase tracking-widest">System Administrator</p>
           </div>
@@ -194,7 +194,7 @@ export default function Layout({ children, activeTab, onTabChange, isDarkMode, o
             : "bg-emerald-50 text-emerald-900/60 border-emerald-100"
         )}>
           <p>PlantVillage Dataset Engine v2.0 • Last Sync: 4 mins ago</p>
-          <p>© 2024 Farmetra Agricultural Intelligence • Secure Admin: {USER_NAME}</p>
+          <p>© 2024 Farmetra Agricultural Intelligence • Secure Admin: <span className="text-gray-500">{USER_NAME}</span></p>
         </footer>
 
         {/* Bottom Nav - Mobile Only */}
