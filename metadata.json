@@ -1,0 +1,8 @@
+{
+  "name": "Farmetra",
+  "description": "Mobile AI-powered crop disease detection with instant diagnosis and severity assessment.",
+  "requestFramePermissions": [
+    "camera"
+  ],
+  "majorCapabilities": []
+}
