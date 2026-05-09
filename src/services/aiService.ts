@@ -4,28 +4,33 @@ import { Diagnosis } from "../types";
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || '' });
 
 export const analyzeCropImage = async (base64Image: string): Promise<Diagnosis> => {
-  if (!process.env.GEMINI_API_KEY) {
+  const key = process.env.GEMINI_API_KEY;
+  if (!key) {
     throw new Error("GEMINI_API_KEY is not configured.");
   }
 
+  const [mimeInfo, base64Data] = base64Image.split(';base64,');
+  const mimeType = mimeInfo.split(':')[1] || "image/jpeg";
+
   const response = await ai.models.generateContent({
-    model: "gemini-3-flash-preview",
+    model: "gemini-flash-latest",
     contents: [
       {
         parts: [
           {
-            text: "Analyze this image of a plant leaf and identify if it has any disease. Provide a detailed diagnosis in JSON format.",
+            text: "Identify the crop and analyze any visible diseases or pests. Provide symptoms, organic treatments, and preventive measures.",
           },
           {
             inlineData: {
-              data: base64Image.split(',')[1] || base64Image,
-              mimeType: "image/jpeg",
+              data: base64Data || base64Image,
+              mimeType: mimeType,
             },
           },
         ],
       },
     ],
     config: {
+      systemInstruction: "You are a professional plant pathologist. Carefully examine the visual evidence to diagnose plant issues. If you are unsure, provide your best clinical assessment. Return the result in JSON format only.",
       responseMimeType: "application/json",
       responseSchema: {
         type: Type.OBJECT,

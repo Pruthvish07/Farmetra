@@ -79,6 +79,7 @@ export default function CameraScreen({ onDiagnosisComplete, onCancel }: CameraSc
       const result = await analyzeCropImage(imageData);
       onDiagnosisComplete(result);
     } catch (err) {
+      console.error("AI Analysis Error:", err);
       setError("AI analysis failed. Please try a different photo.");
       setCapturedImage(null);
     } finally {
