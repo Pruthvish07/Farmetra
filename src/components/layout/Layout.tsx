@@ -57,7 +57,7 @@ export default function Layout({ children, activeTab, onTabChange, isDarkMode, o
             <img 
               src={logoImg} 
               alt="Farmetra Logo" 
-              className="w-full h-full object-contain" 
+              className="w-full h-full object-cover" 
               referrerPolicy="no-referrer" 
             />
           </div>
@@ -155,7 +155,7 @@ export default function Layout({ children, activeTab, onTabChange, isDarkMode, o
                 <img 
                   src={logoImg} 
                   alt="Farmetra Logo" 
-                  className="w-full h-full object-contain" 
+                  className="w-full h-full object-cover" 
                   referrerPolicy="no-referrer" 
                 />
              </div>
