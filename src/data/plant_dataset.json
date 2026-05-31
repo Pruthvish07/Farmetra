@@ -1,0 +1,338 @@
+{
+  "plants": [
+    {
+      "plant_id": "tomato",
+      "common_name": "Tomato",
+      "scientific_name": "Solanum lycopersicum",
+      "optimal_conditions": {
+        "temperature_range": "21°C - 29°C (70°F - 85°F)",
+        "watering_frequency": "Deep watering 1-2 times per week (keep soil consistently moist but not waterlogged)",
+        "soil_type": "Well-drained, fertile, loamy soil rich in organic matter (pH 6.0 - 6.8)",
+        "sunlight": "Full sun (6 - 8 hours of direct sunlight daily)"
+      },
+      "diseases": [
+        {
+          "disease_id": "tomato_early_blight",
+          "disease_name": "Early Blight",
+          "causal_agent": "Fungus (Alternaria solani)",
+          "symptoms": [
+            "Circular dark spots with concentric rings ('target board' pattern) appearing first on older lower leaves.",
+            "Yellowing of surrounding leaf tissue, leading to premature leaf drop.",
+            "Dark, sunken, leathery lesions near the stem end of the fruit.",
+            "Dark, dry spots on stems with similar concentric rings."
+          ],
+          "severity_level": "Medium",
+          "organic_control": [
+            "Apply copper-based organic fungicides early in the season or at first sign of symptoms.",
+            "Spray leaves with a diluted solution of Bacillus subtilis or neem oil.",
+            "Apply organic mulch around the base of the plant to prevent soil-borne spores from splashing onto leaves.",
+            "Prune lower branches to improve airflow and keep foliage dry."
+          ],
+          "chemical_control": [
+            "Apply chlorothalonil, mancozeb, or difenoconazole-based commercial fungicides.",
+            "Rotate chemical groups to prevent resistance development."
+          ],
+          "prevention_tips": [
+            "Practice a 3-year crop rotation schedule excluding solanaceous crops (peppers, eggplants, potatoes).",
+            "Water at the base of the plant using drip irrigation rather than overhead sprinklers.",
+            "Always source certified disease-free seeds and seedlings.",
+            "Sanitize garden tools, tomato cages, and stakes with a 10% bleach solution."
+          ]
+        },
+        {
+          "disease_id": "tomato_yellow_leaf_curl",
+          "disease_name": "Tomato Yellow Leaf Curl",
+          "causal_agent": "Virus (Tomato Yellow Leaf Curl Virus - TYLCV, transmitted by Whiteflies)",
+          "symptoms": [
+            "Severe stunting of the entire plant, especially if infected at an early stage.",
+            "Leaves turn pale green or yellow along the margins and interveinal areas.",
+            "Upward curling, cupping, and crinkling of leaf margins.",
+            "Leaves become abnormally small, leathery, and thick.",
+            "Failure to set fruit or heavy blossom drop, resulting in minimal yield."
+          ],
+          "severity_level": "High",
+          "organic_control": [
+            "Install yellow sticky traps to capture and monitor whitefly vectors.",
+            "Apply insecticidal soaps, horticultural oils, or neem oil to suppress whitefly populations.",
+            "Release natural predators of whiteflies, such as lacewings or predatory mites (Phytoseiidae).",
+            "Remove and immediately destroy infected plants to prevent further spread."
+          ],
+          "chemical_control": [
+            "Apply systemic insecticides, such as imidacloprid or acetamiprid, to control whitefly populations.",
+            "Use synthetic pyrethroids or organophosphates for quick knockdown of adult whitefly populations."
+          ],
+          "prevention_tips": [
+            "Grow whitefly-resistant tomato cultivars (e.g., 'Tygress', 'Tribute').",
+            "Use fine mesh insect netting, floating row covers, or silver reflective mulches to deter whiteflies.",
+            "Keep the surrounding field free of weeds and solanaceous hosts that harbor both the virus and vector.",
+            "Observe a strict host-free window between planting seasons."
+          ]
+        }
+      ]
+    },
+    {
+      "plant_id": "potato",
+      "common_name": "Potato",
+      "scientific_name": "Solanum tuberosum",
+      "optimal_conditions": {
+        "temperature_range": "15°C - 20°C (60°F - 68°F)",
+        "watering_frequency": "1-2 inches of water per week (maintain consistent moisture, especially during tuber bulking)",
+        "soil_type": "Loose, well-drained, sandy loam soil with high organic content (pH 4.8 - 5.5 to reduce scab disease)",
+        "sunlight": "Full sun (6 - 8 hours of direct sunlight daily)"
+      },
+      "diseases": [
+        {
+          "disease_id": "potato_late_blight",
+          "disease_name": "Late Blight",
+          "causal_agent": "Oomycete (Phytophthora infestans)",
+          "symptoms": [
+            "Water-soaked, dark green to black lesions starting on leaf tips and margins.",
+            "A white, fuzzy mold growth on the undersides of leaves during humid or wet conditions.",
+            "Rapid collapse, rotting, and blackening of the entire plant canopy under high humidity.",
+            "Copper-brown, dry, granular rot or skin discoloration on tubers."
+          ],
+          "severity_level": "High",
+          "organic_control": [
+            "Apply copper-based organic formulations or copper hydroxide sprays proactively.",
+            "Utilize bio-fungicides containing Bacillus subtilis or Streptomyces lydicus.",
+            "Prune infected foliage immediately and bury or burn it (do not compost infested material)."
+          ],
+          "chemical_control": [
+            "Use systemic and contact fungicides containing metalaxyl, fluopicolide, chlorothalonil, or cymoxanil.",
+            "Execute spray programs starting before the canopy closes or when localized weather forecasts warn of blight conditions."
+          ],
+          "prevention_tips": [
+            "Only plant certified disease-free seed tubers.",
+            "Destroy all cull piles and volunteer potato plants which serve as primary inoculum sources.",
+            "Avoid overhead irrigation, particularly in the late afternoon or evening.",
+            "Harvest only after the vine canopy has been completely dead for at least 14 days to minimize tuber infection."
+          ]
+        },
+        {
+          "disease_id": "potato_common_scab",
+          "disease_name": "Common Scab",
+          "causal_agent": "Bacterium (Streptomyces scabies)",
+          "symptoms": [
+            "Circular, raised, corky, dark brown lesions on the surface of the tubers.",
+            "Sunken, pitted pits on tuber skin which reduce aesthetic and market quality.",
+            "Slightly brownish russeting or star-shaped lesions on young developing tubers.",
+            "Leaves, stems, and blossoms typically remain entirely asymptomatic."
+          ],
+          "severity_level": "Medium",
+          "organic_control": [
+            "Amended soil with organic sulfur to keep the soil pH within a strongly acidic range (pH 5.0 - 5.2).",
+            "Maintain soil moisture near field capacity during tuber initiation and early development (first 4 - 6 weeks).",
+            "Apply composted pine needles or peat moss to naturally lower localized root-zone pH."
+          ],
+          "chemical_control": [
+            "Seed tuber treatment with fludioxonil or mancozeb prior to planting.",
+            "Apply soil fumigants or chloropicrin in severe commercially monocultured fields."
+          ],
+          "prevention_tips": [
+            "Rotate potato fields with non-hosts, such as alfalfa, rye, oats, or corn.",
+            "Avoid planting highly susceptible potato varieties; opt for resistant cultivars (e.g., 'Russet Burbank', 'Norgold').",
+            "Avoid using alkaline soil amendments, uncomposted animal manures, wood ash, or lime.",
+            "Utilize cover crops that do not host Streptomyces bacterial strains."
+          ]
+        }
+      ]
+    },
+    {
+      "plant_id": "rice",
+      "common_name": "Rice",
+      "scientific_name": "Oryza sativa",
+      "optimal_conditions": {
+        "temperature_range": "20°C - 35°C (68°F - 95°F)",
+        "watering_frequency": "Flooded water depth of 5-10 cm during vegetative phase (requires heavy water availability)",
+        "soil_type": "Heavy clay or clay-loamy soils with poor drainage to retain surface water (pH 5.5 - 6.5)",
+        "sunlight": "High intensity full sun (8 hours daily for maximum tillering and grain setting)"
+      },
+      "diseases": [
+        {
+          "disease_id": "rice_blast",
+          "disease_name": "Rice Blast",
+          "causal_agent": "Fungus (Magnaporthe oryzae)",
+          "symptoms": [
+            "Spindle-shaped, diamond-shaped, or elliptical lesions on leaf blades with gray centers and reddish-brown borders.",
+            "Lesions expand rapidly and coalesce, causing entire leaves to dry, wither, and die.",
+            "Brownish-black discoloration and necrosis of the panicle base node (known as 'neck blast' or 'rotten neck'), leading to empty grains.",
+            "Lesions on the nodes of leaf sheaths, causing the stem to break easily."
+          ],
+          "severity_level": "High",
+          "organic_control": [
+            "Apply bio-insecticides/fungicides containing Pseudomonas fluorescens formulation as a seed treatment and foliar spray.",
+            "Apply silicon-rich mineral amendments (such as diatomaceous earth or rice husk ash) to strengthen host cell walls.",
+            "Maintain continuous shallow flooding of the rice fields to reduce spore germination rates on dry soil."
+          ],
+          "chemical_control": [
+            "Apply systemic fungicides containing tricyclazole, azoxystrobin, edifenphos, or carbendazim.",
+            "Use prophylactic seed treatments and early vegetative stage prophylactic sprays."
+          ],
+          "prevention_tips": [
+            "Plant blast-resistant rice cultivars developed for the local agro-ecological zone.",
+            "Avoid over-application of nitrogen fertilizers, which triggers lush vegetative growth susceptible to fungal penetration.",
+            "Enforce uniform sowing dates and optimal spacing to avoid over-congested canopies.",
+            "Burn or deeply plow post-harvest rice straw and stubble to eliminate overwintering mycelia."
+          ]
+        },
+        {
+          "disease_id": "rice_bacterial_leaf_blight",
+          "disease_name": "Bacterial Leaf Blight",
+          "causal_agent": "Bacterium (Xanthomonas oryzae pv. oryzae)",
+          "symptoms": [
+            "Wavy, yellow to straw-colored lesions starting on leaf tips and margins, progressing downward.",
+            "Young seedlings show rapid structural wilting, drying, and rolling of leaves (called 'kresek' stage).",
+            "Droplets of milky or yellow bacterial ooze (exudate) on leaves under humid morning conditions.",
+            "Infected leaves eventually turn fully grayish-white, dry out, and lose photosynthetic capacity."
+          ],
+          "severity_level": "High",
+          "organic_control": [
+            "Spray freshly made wild mint (Mentha arvensis) leaf extracts or garlic bulb extracts, which possess natural antibacterial activity.",
+            "Apply copper-oxychloride formulations combined with organic sticker agents.",
+            "Drain the rice paddies temporarily to dry field moisture and disrupt bacterial reproduction cycles."
+          ],
+          "chemical_control": [
+            "Spray with streptocycline (streptomycin sulfate + tetracycline hydrochloride combination).",
+            "Apply copper-based chemicals like copper hydroxide or copper sulfate heptahydrate."
+          ],
+          "prevention_tips": [
+            "Construct proper field drainage channels to prevent prolonged stagnation of deep waters.",
+            "Minimize mechanical damage to plants during transplanting or weeding to prevent bacterial entry wounds.",
+            "Optimize nitrogen dosing by dividing it into 3 split applications based on leaf color chart monitoring.",
+            "Keep bunds and irrigation canals clean of wild grass hosts (like Leersia oryzoides)."
+          ]
+        }
+      ]
+    },
+    {
+      "plant_id": "wheat",
+      "common_name": "Wheat",
+      "scientific_name": "Triticum aestivum",
+      "optimal_conditions": {
+        "temperature_range": "12°C - 24°C (54°F - 75°F)",
+        "watering_frequency": "Moderate water (Needs 350-500 mm rainfall/irrigation, timed to crown root initiation, jointing, and flowering stages)",
+        "soil_type": "Well-aerated, deep, rich loamy and clayey soils with high water retention capacity (pH 6.0 - 7.0)",
+        "sunlight": "Full sun (6 - 8 hours of direct, high-intensity sunlight during head filling)"
+      },
+      "diseases": [
+        {
+          "disease_id": "wheat_leaf_rust",
+          "disease_name": "Leaf Rust (Brown Rust)",
+          "causal_agent": "Fungus (Puccinia triticina)",
+          "symptoms": [
+            "Small, circular to oval, orange-brown pustules (uredinia) scattered randomly across leaf blades and sheaths.",
+            "Pustules rupture the leaf epidermis, releasing dusty orange spore masses that stain clothing and equipment.",
+            "Chlorotic yellowing of leaf areas surrounding rust pustules.",
+            "Premature drying, curling of leaves, and reduction in the size and weight of kernels."
+          ],
+          "severity_level": "Medium",
+          "organic_control": [
+            "Foliar spray with fermented cow urine solution or neem seed kernel extract (NSKE).",
+            "Apply sulfur-based dust or organic wettable micro-refined sulfur.",
+            "Implement high-density crop polycultures to break fungal spore dispersal lines."
+          ],
+          "chemical_control": [
+            "Foliar applications of triazole fungicides (such as propiconazole, tebuconazole, or triadimefon).",
+            "Apply strobilurins (e.g., azoxystrobin) in early infection stages to protect flag leaves."
+          ],
+          "prevention_tips": [
+            "Grow durable, multi-gene resistant wheat seed cultivars (containing active Sr or Lr genes).",
+            "Eliminate alternate weed hosts and volunteer self-sown wheat during the fallow period.",
+            "Sow seeds early in the planting window to allow plants to mature before warm weather triggers peak rust germination."
+          ]
+        },
+        {
+          "disease_id": "wheat_powdery_mildew",
+          "disease_name": "Powdery Mildew",
+          "causal_agent": "Fungus (Blumeria graminis f. sp. tritici)",
+          "symptoms": [
+            "White, fluffy, cottony or powdery fungal patches (mycelium) on the lower leaves and stems first.",
+            "These patches expand, turning powdery grey or light brown as they age.",
+            "Small, dark brown to black spherical structures (cleistothecia) develop inside the aging grey patches.",
+            "Severely affected leaves lose color, wither, dry out, and suffer from photosynthetic failure."
+          ],
+          "severity_level": "Medium",
+          "organic_control": [
+            "Spray with a solution of potassium bicarbonate or sodium bicarbonate mixed with soft soap as a spreading agent.",
+            "Apply diluted milk/whey sprays (1:9 ratio with water), which generate free radicals on leaves under sunlight to kill spores.",
+            "Prune over-dense, shade-heavy field margins to increase overall sunlight penetration."
+          ],
+          "chemical_control": [
+            "Use systemic fungicides like triadimenol, propiconazole, flutriafol, or fenpropimorph.",
+            "Ensure protection spray covers the vital upper flag leaf during the boot stage."
+          ],
+          "prevention_tips": [
+            "Avoid high seed sowing densities to facilitate wind circulation in the crop canopy.",
+            "Apply balanced nitrogen inputs (excess nitrogen encourages fleshy, soft tissue prone to mildew infection).",
+            "Plant resistant crop varieties and practice field rotations with non-cereal crops."
+          ]
+        }
+      ]
+    },
+    {
+      "plant_id": "corn",
+      "common_name": "Corn (Maize)",
+      "scientific_name": "Zea mays",
+      "optimal_conditions": {
+        "temperature_range": "18°C - 32°C (64°F - 90°F)",
+        "watering_frequency": "1.5-2 inches of water per week (extremely critical during silking, tasseling, and cob development)",
+        "soil_type": "Deep, loose, fertile, sandy-loam or silty-loam soil rich in organic matter (pH 5.8 - 6.8)",
+        "sunlight": "Full sun (Requires 8 - 10 hours of intense sunlight daily, very sensitive to shade)"
+      },
+      "diseases": [
+        {
+          "disease_id": "corn_gray_leaf_spot",
+          "disease_name": "Gray Leaf Spot",
+          "causal_agent": "Fungus (Cercospora zeae-maydis)",
+          "symptoms": [
+            "Small, tan or brown spots that expand into long, narrow, rectangular lesions restricted by leaf veins.",
+            "Lesions display sharp, parallel borders and turn gray-brown or ash-gray under humid conditions.",
+            "Severe lesions merge, causing extensive blighting, death of whole leaves, and structural lodging of the stalks.",
+            "Early defoliation leads to under-filled cobs and light, chaffy grain."
+          ],
+          "severity_level": "High",
+          "organic_control": [
+            "Apply organic compost tea sprays populated with beneficial organisms to crowd out fungal pathogens on leaves.",
+            "Incorporate beneficial Trichoderma fungi species into the soil to accelerate the decomposition of fungal-harboring crop residues.",
+            "Prune low hanging leaves to reduce contact with soil splash."
+          ],
+          "chemical_control": [
+            "Spray strobilurin (e.g., pyraclostrobin) or triazole (e.g., prothioconazole) fungicides.",
+            "Apply chemical treatments strictly at or before the VT (tasseling) stage if conditions are warm and wet."
+          ],
+          "prevention_tips": [
+            "Engage in a 2-year crop rotation schedule away from corn (e.g., rotate with soybeans, alfalfa, or clover).",
+            "Perform deep tillage or conservation plowing to bury infested stalks and residue, preventing spore survival.",
+            "Use hybrids screened for high tolerance/resistance to GLS (Gray Leaf Spot)."
+          ]
+        },
+        {
+          "disease_id": "corn_common_rust",
+          "disease_name": "Common Rust",
+          "causal_agent": "Fungus (Puccinia sorghi)",
+          "symptoms": [
+            "Elongated, rusty, golden-brown to cinnamon-brown pustules on both upper and lower surfaces of leaves.",
+            "Pustules break open, releasing masses of powdery, brown, wind-borne spores (urediniospores).",
+            "Infected leaves show chlorosis (yellowing), necrosis (death), and dry out rapidly.",
+            "Pustules turn blackish or dark brown towards the end of the growing season as winter spores (teliospores) form."
+          ],
+          "severity_level": "Medium",
+          "organic_control": [
+            "Apply foliar bio-fungicide sprays containing Bacillus velezensis or extract of Reynoutria sachalinensis.",
+            "Dust plants with micro-refined dusting sulfur to establish an inhospitable barrier for spores.",
+            "Use drip irrigation to prevent long periods of leaf wetness."
+          ],
+          "chemical_control": [
+            "Apply pyraclostrobin, azoxystrobin, trifloxystrobin, or propiconazole-based fungicides.",
+            "Treat immediately if infection occurs in the whorl stage or if high disease pressure is forecasted."
+          ],
+          "prevention_tips": [
+            "Sow corn varieties with high resistance conferred by the Rp gene family.",
+            "Destroy alternative wild weed hosts, particularly Oxalis species (wood sorrel) where sexual reproduction of the fungus occurs.",
+            "Sow early in the planting window to establish robust leaves before warm, humid weather triggers rust cycles."
+          ]
+        }
+      ]
+    }
+  ]
+}
