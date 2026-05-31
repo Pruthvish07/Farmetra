@@ -4,6 +4,7 @@ import { ReactNode } from 'react';
 import { USER_NAME } from '../../constants';
 import { cn } from '../../lib/utils';
 import { Sun, Moon } from 'lucide-react';
+import logoImg from '../../assets/images/farmetra_logo_1780246757391.png';
 
 interface LayoutProps {
   children: ReactNode;
@@ -52,8 +53,13 @@ export default function Layout({ children, activeTab, onTabChange, isDarkMode, o
         isDarkMode ? "bg-[#111814] border-emerald-900/30" : "bg-white border-emerald-100"
       )}>
         <div className="p-8 flex items-center gap-3">
-          <div className="w-12 h-12 bg-emerald-600 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-emerald-200 transform -rotate-3">
-            <Sprout size={28} />
+          <div className="w-12 h-12 flex items-center justify-center rounded-2xl overflow-hidden shadow-xl shadow-emerald-200/20 transform -rotate-3 border border-emerald-500/10 hover:rotate-0 transition-transform duration-300 shrink-0 bg-white dark:bg-emerald-950">
+            <img 
+              src={logoImg} 
+              alt="Farmetra Logo" 
+              className="w-full h-full object-contain" 
+              referrerPolicy="no-referrer" 
+            />
           </div>
           <h1 className={cn(
             "text-2xl font-black tracking-tight",
@@ -145,8 +151,13 @@ export default function Layout({ children, activeTab, onTabChange, isDarkMode, o
           </div>
           
           <div className="md:hidden flex items-center gap-2">
-             <div className="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center text-white shadow-md">
-                <Sprout size={18} />
+             <div className="w-8 h-8 flex items-center justify-center rounded-lg overflow-hidden shadow-md border border-emerald-500/10 shrink-0 bg-white">
+                <img 
+                  src={logoImg} 
+                  alt="Farmetra Logo" 
+                  className="w-full h-full object-contain" 
+                  referrerPolicy="no-referrer" 
+                />
              </div>
              <h1 className={cn(
                "text-xl font-black tracking-tighter",

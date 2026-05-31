@@ -129,7 +129,15 @@ export default function App() {
   return (
     <Layout 
       activeTab={showCamera ? 'camera' : activeTab} 
-      onTabChange={(tab) => tab === 'camera' ? setShowCamera(true) : setActiveTab(tab)}
+      onTabChange={(tab) => {
+        if (tab === 'camera') {
+          setShowCamera(true);
+        } else {
+          setActiveTab(tab);
+          setShowCamera(false);
+          setCurrentDiagnosis(null);
+        }
+      }}
       isDarkMode={isDarkMode}
       onToggleTheme={toggleTheme}
     >
