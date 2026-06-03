@@ -1,123 +1,154 @@
-import { motion } from 'motion/react';
-import ReactMarkdown from 'react-markdown';
-import { Diagnosis } from '../../types';
-import { AlertCircle, CheckCircle2, ShieldCheck, Stethoscope, MapPin, Share2, Download, X } from 'lucide-react';
-import { cn } from '../../lib/utils';
+import { Check, ArrowLeft, Lightbulb } from "lucide-react";
+import { Diagnosis } from "../../types";
+import { cn } from "../../lib/utils";
 
 interface DiagnosisResultProps {
   diagnosis: Diagnosis;
   onClose: () => void;
 }
 
+// Agrononmic map for scientific equivalents to match mockup 3
+const scientificNames: Record<string, string> = {
+  "Early Blight": "Alternaria solani",
+  "Late Blight": "Phytophthora infestans",
+  "Bacterial Spot": "Xanthomonas perforans",
+  "Leaf Mold": "Passalora fulva",
+  "Powdery Mildew": "Podosphaera macularis",
+  "Yellow Leaf Curl Virus": "Tomato yellow leaf curl virus",
+  "Mosaic Virus": "Tobamovirus mosaic",
+  "Septoria Leaf Spot": "Septoria lycopersici",
+  "Two-Spotted Spider Mite": "Tetranychus urticae",
+  "Target Spot": "Corynespora cassiicola",
+  "Healthy": "Optimum Health • No active pathogens",
+};
+
 export default function DiagnosisResult({ diagnosis, onClose }: DiagnosisResultProps) {
+  const scientificName = scientificNames[diagnosis.diseaseName] || "Pathogen species unknown";
+
+  // Map low/medium/high to visual severity matching the mockup
+  const riskLabels: Record<string, string> = {
+    Low: "Minimal",
+    Medium: "Moderate",
+    High: "Critical Priority",
+  };
+
+  const riskClasses: Record<string, string> = {
+    Low: "bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400 border border-blue-200/50",
+    Medium: "bg-[#FFF2E6] text-[#E67A00] dark:bg-orange-500/10 dark:text-orange-400 border border-orange-200/50",
+    High: "bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-400 border border-red-200/50",
+  };
+
   return (
-    <div className="fixed inset-0 bg-[#F4F9F4] dark:bg-[#0A0F0D] z-[110] flex flex-col md:flex-row overflow-hidden font-sans transition-colors">
-      {/* Visual Side */}
-      <div className="h-[40vh] md:h-full md:w-1/2 relative shrink-0">
-        <img src={diagnosis.imageUrl} className="w-full h-full object-cover md:rounded-r-[48px]" />
-        <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-emerald-950/90 tracking-tighter via-emerald-950/40 to-transparent" />
-        
+    <div className="fixed inset-0 bg-[#F4F9F4] dark:bg-[#0A0F0D] z-[120] flex flex-col font-sans select-none overflow-y-auto">
+      {/* Header bar matches mockup 3 */}
+      <header className="h-16 px-6 bg-white dark:bg-[#111814] flex items-center gap-4 shrink-0 border-b border-[#E5E5E5]/50 dark:border-white/5 shadow-sm sticky top-0 z-30">
         <button 
           onClick={onClose}
-          className="absolute top-6 left-6 w-12 h-12 bg-white/20 backdrop-blur-xl rounded-2xl flex items-center justify-center text-white border border-white/20 active:scale-95 transition-all"
+          className="p-2 -ml-2 rounded-xl text-[#1B4332] dark:text-[#E0E7E1] hover:bg-slate-50 dark:hover:bg-white/5 active:scale-95 transition-all"
         >
-          <X size={24} />
+          <ArrowLeft size={20} />
         </button>
+        <h2 className="font-extrabold text-[#1B4332] dark:text-white text-base tracking-tight uppercase">
+          Detect Disease
+        </h2>
+      </header>
 
-        <div className="absolute bottom-8 left-8 right-8 text-white max-w-lg">
-          <div className="flex items-center gap-3 mb-4">
-            <span className={cn(
-              "px-3 py-1 rounded-lg text-[10px] font-black uppercase shadow-lg",
-              diagnosis.severity === 'High' ? "bg-red-600" :
-              diagnosis.severity === 'Medium' ? "bg-orange-500" :
-              "bg-emerald-500"
-            )}>
-              {diagnosis.severity} SEVERITY
-            </span>
-            <span className="bg-white/10 backdrop-blur-md px-3 py-1 rounded-lg text-[10px] font-black capitalize border border-white/10 tracking-widest">
-              {diagnosis.diseaseType.toUpperCase()}
-            </span>
-          </div>
-          <h2 className="text-4xl md:text-6xl font-black tracking-tighter leading-none mb-4 uppercase">{diagnosis.diseaseName}</h2>
-          <div className="flex items-center gap-2 opacity-80">
-            <div className="bg-emerald-400 w-2 h-2 rounded-full animate-pulse" />
-            <p className="text-sm font-bold uppercase tracking-widest">{diagnosis.cropName} Pathogen Analysis</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Data Side */}
-      <div className="flex-1 overflow-y-auto p-6 md:p-12 space-y-10 md:bg-white dark:md:bg-white/5 md:m-6 md:rounded-[48px] shadow-2xl border border-emerald-50 dark:border-white/10 transition-colors">
-        <div className="flex flex-col md:flex-row gap-6 justify-between items-start">
-          <div className="space-y-1">
-            <h3 className="text-emerald-500 dark:text-white text-2xl font-black tracking-tighter uppercase">AI Diagnostic Report</h3>
-            <p className="text-slate-400 text-xs font-bold uppercase tracking-[0.2em]">{new Date(diagnosis.timestamp).toLocaleString()} • REF: {diagnosis.id.toUpperCase()}</p>
-          </div>
+      {/* Main two sections container */}
+      <div className="flex-1 max-w-2xl w-full mx-auto p-4 space-y-4">
+        
+        {/* 1. Viewport scanning frame matching mockup 3 */}
+        <div className="w-full h-72 rounded-[32px] overflow-hidden relative border-4 border-white dark:border-[#111814] shadow-xl bg-black">
+          <img 
+            src={diagnosis.imageUrl} 
+            alt={diagnosis.cropName} 
+            className="w-full h-full object-cover opacity-90" 
+          />
           
-          <div className="bg-emerald-50 px-6 py-4 rounded-3xl border border-emerald-100 flex items-center gap-4">
-            <div className="text-right">
-              <p className="text-[10px] font-black text-emerald-800 uppercase tracking-widest">CNN Engine Confidence</p>
-              <p className="text-2xl font-black text-emerald-600">{Math.round(diagnosis.confidence * 100)}%</p>
-            </div>
-            <ShieldCheck size={32} className="text-emerald-600" />
+          {/* Target Scan Corner Brackets */}
+          <div className="absolute inset-6 pointer-events-none">
+            <div className="absolute -top-1 -left-1 w-8 h-8 border-t-4 border-l-4 border-white rounded-tl-xl" />
+            <div className="absolute -top-1 -right-1 w-8 h-8 border-t-4 border-r-4 border-white rounded-tr-xl" />
+            <div className="absolute -bottom-1 -left-1 w-8 h-8 border-b-4 border-l-4 border-white rounded-bl-xl" />
+            <div className="absolute -bottom-1 -right-1 w-8 h-8 border-b-4 border-r-4 border-white rounded-br-xl" />
+          </div>
+
+          {/* Floating bulb icon at the upper-right */}
+          <div className="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/20 backdrop-blur-md border border-white/25 flex items-center justify-center text-white shadow-md animate-pulse">
+            <Lightbulb size={18} />
+          </div>
+
+          {/* Location / Meta Overlay */}
+          <div className="absolute bottom-4 left-6 bg-black/60 backdrop-blur-md px-3.5 py-1.5 rounded-xl border border-white/10 text-[9px] font-mono text-emerald-400 font-bold uppercase tracking-wider">
+            CNN SENSOR CONFIDENCE: {Math.round(diagnosis.confidence * 100)}%
           </div>
         </div>
 
-        {/* Bento Details */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <section className="bg-slate-50 p-6 rounded-[32px] border border-slate-100 space-y-4">
-            <div className="flex items-center gap-3 text-[#1B4332]">
-              <Stethoscope size={20} />
-              <h3 className="font-black uppercase tracking-widest text-xs">Visual Symptoms</h3>
-            </div>
-            <ul className="space-y-3">
-              {diagnosis.symptoms.map((symptom, i) => (
-                <li key={i} className="flex gap-3 text-sm text-[#4A4A4A] font-medium leading-relaxed">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-1.5 shrink-0" />
-                  {symptom}
-                </li>
-              ))}
-            </ul>
-          </section>
+        {/* 2. Results specification sheet card */}
+        <div className="bg-white dark:bg-[#111814] rounded-[36px] p-6 border border-[#E5E5E5] dark:border-white/5 shadow-xl space-y-6">
+          <div className="space-y-1 text-left">
+            <span className="text-[10px] font-black uppercase text-[#8E9299] tracking-widest block">
+              Result
+            </span>
+            <h3 className="text-2xl font-black text-[#CE4A4A] dark:text-red-400 tracking-tight leading-none uppercase">
+              {diagnosis.diseaseName}
+            </h3>
+            <p className="text-xs font-semibold text-slate-500 italic mt-0.5">
+              ({scientificName})
+            </p>
+          </div>
 
-          <section className="bg-[#1B4332] text-white p-8 rounded-[32px] space-y-6 shadow-xl shadow-emerald-900/10">
-            <div className="flex items-center gap-3 text-emerald-400">
-              <ShieldCheck size={20} />
-              <h3 className="font-black uppercase tracking-widest text-xs">Pathogen Protocol</h3>
+          {/* Grid fields */}
+          <div className="grid grid-cols-2 gap-4 border-t border-b border-[#E5E5E5]/50 dark:border-white/5 py-4 text-xs font-bold">
+            <div className="space-y-1 text-left">
+              <span className="text-[9px] text-[#8E9299] uppercase tracking-widest block font-bold">Risk Level</span>
+              <span className={cn("px-3.5 py-1 rounded-xl text-[10px] font-black inline-block uppercase tracking-wider", riskClasses[diagnosis.severity] || riskClasses.Medium)}>
+                {riskLabels[diagnosis.severity] || "Moderate"}
+              </span>
             </div>
-            <div className="space-y-4">
-              {diagnosis.treatment.map((step, i) => (
-                <div key={i} className="flex gap-4 text-sm opacity-90 leading-relaxed group">
-                  <span className="font-black text-emerald-400 group-hover:scale-110 transition-transform">0{i+1}</span>
-                  {step}
+
+            <div className="space-y-1 text-left">
+              <span className="text-[9px] text-[#8E9299] uppercase tracking-widest block font-bold">Affected Crop</span>
+              <span className="text-sm font-black text-[#1B4332] dark:text-white uppercase tracking-tight block pt-0.5">
+                {diagnosis.cropName}
+              </span>
+            </div>
+          </div>
+
+          {/* Description */}
+          <div className="space-y-2 text-left">
+            <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Description</h4>
+            <p className="text-xs leading-relaxed text-slate-600 dark:text-slate-350 font-medium">
+              {diagnosis.diseaseName === "Healthy" 
+                ? "This crop crop is demonstrating optimum leaf health. Keep applying standard water and organic fertilizer as indicated." 
+                : `${diagnosis.diseaseName} is a severe pathogen that spreads through water splash and warm, damp conditions. Early localized mitigation will prevent rapid outbreak expansion across surrounding foliage.`}
+            </p>
+          </div>
+
+          {/* Recommended Solutions List */}
+          <div className="space-y-3.5 text-left">
+            <h4 className="text-[10px] font-black text-[#1B4332] dark:text-emerald-400 uppercase tracking-widest font-bold">
+              Recommended Solutions
+            </h4>
+            <div className="space-y-2.5">
+              {(diagnosis.treatment.length > 0 ? diagnosis.treatment : ["Remove infested lower leaves to stop splash-back transmission", "Spray copper fungicides or bio-agents sequentially", "Sanitize all pruning tools regularly with alcohol wipes", "Avoid sprinkler overhead watering; convert to soil-base drip"]).map((sol, index) => (
+                <div key={index} className="flex gap-3 items-start group">
+                  <div className="w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center text-white shrink-0 mt-0.5 transition-transform group-hover:scale-110">
+                    <Check size={12} strokeWidth={3} />
+                  </div>
+                  <p className="text-xs font-medium text-slate-700 dark:text-slate-200 leading-normal">
+                    {sol}
+                  </p>
                 </div>
               ))}
             </div>
-          </section>
-        </div>
-
-        {/* Preventive Measures */}
-        <section className="space-y-4">
-          <div className="flex items-center gap-3 text-emerald-800">
-            <AlertCircle size={20} />
-            <h3 className="font-black uppercase tracking-widest text-xs text-slate-900 dark:text-white">Integrated Farm Management</h3>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {diagnosis.preventiveMeasures.map((measure, i) => (
-              <div key={i} className="bg-white p-5 rounded-2xl border border-emerald-50 shadow-sm text-sm text-slate-700 font-medium hover:border-emerald-200 transition-colors">
-                {measure}
-              </div>
-            ))}
-          </div>
-        </section>
 
-        {/* Action Buttons */}
-        <div className="grid grid-cols-2 gap-4 pt-8">
-          <button className="flex items-center justify-center gap-3 bg-slate-100 text-slate-700 px-8 py-5 rounded-2xl font-black uppercase tracking-[0.2em] text-[10px] hover:bg-slate-200 active:scale-95 transition-all">
-            <Download size={20} /> Download Report
-          </button>
-          <button className="flex items-center justify-center gap-3 bg-emerald-600 text-white px-8 py-5 rounded-2xl font-black uppercase tracking-[0.2em] text-[10px] shadow-xl shadow-emerald-200 active:scale-95 transition-all">
-            <Share2 size={20} /> Deploy Alert
+          {/* Save to History Bottom Action Button */}
+          <button 
+            onClick={onClose}
+            className="w-full bg-[#1B4332] hover:bg-[#143326] text-white font-black uppercase text-xs tracking-widest py-4 rounded-2xl shadow-xl hover:shadow-emerald-900/10 active:scale-95 transition-all text-center flex items-center justify-center"
+          >
+            Save to History
           </button>
         </div>
       </div>
