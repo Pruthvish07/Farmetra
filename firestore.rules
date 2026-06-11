@@ -1,0 +1,114 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global Safety Net (Rule 1)
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Reuseable, hardened global helpers
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    // Determines if the user is the bootstrapped system administrator
+    function isAdmin() {
+      return isSignedIn() && (
+        request.auth.token.email == "pruthvishbshetty45@gmail.com" ||
+        (request.auth.token.email_verified == true && exists(/databases/$(database)/documents/admins/$(request.auth.uid)))
+      );
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // Helper to extract incoming and existing records
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Pillar 2: Validation Blueprints for UserProfile
+    function isValidUserProfile(data) {
+      return data.uid is string && data.uid.size() <= 128 && data.uid == request.auth.uid &&
+             data.displayName is string && data.displayName.size() <= 200 &&
+             data.email is string && data.email.size() <= 200 &&
+             data.role is string && (data.role == "Farmer" || data.role == "Expert" || data.role == "Admin") &&
+             data.language is string && (data.language == "en" || data.language == "hi" || data.language == "kn");
+    }
+
+    match /users/{userId} {
+      allow get: if isSignedIn();
+      allow list: if isSignedIn();
+      allow create: if isOwner(userId) && isValidUserProfile(incoming()) && (incoming().role != "Admin" || request.auth.token.email == "pruthvishbshetty45@gmail.com");
+      allow update: if isOwner(userId) && isValidUserProfile(incoming()) && (incoming().role == existing().role || request.auth.token.email == "pruthvishbshetty45@gmail.com");
+      allow delete: if isAdmin();
+    }
+
+    // Pillar 2: Validation Blueprints for Feedbacks
+    function isValidFeedback(data) {
+      return data.id is string && data.id.size() <= 128 &&
+             data.userId is string && data.userId == request.auth.uid &&
+             data.userName is string && data.userName.size() <= 200 &&
+             data.userEmail is string && data.userEmail.size() <= 200 &&
+             data.text is string && data.text.size() <= 2000 &&
+             data.likes is list && data.likes.size() <= 1000 &&
+             data.adminLikes is list && data.adminLikes.size() <= 100;
+    }
+
+    match /feedbacks/{feedbackId} {
+      // Secure List checking (Pillar 8)
+      allow read, list: if isSignedIn();
+      
+      allow create: if isSignedIn() && isValidId(feedbackId) && isValidFeedback(incoming()) && 
+                    incoming().likes.size() == 0 && incoming().adminLikes.size() == 0;
+      
+      allow update: if isSignedIn() && (
+        // Action 1: Standard user toggles like
+        (incoming().diff(existing()).affectedKeys().hasOnly(['likes']) && 
+         ( (incoming().likes.size() == existing().likes.size() + 1 && incoming().likes.hasAll(existing().likes) && incoming().likes.hasAny([request.auth.uid])) || 
+           (incoming().likes.size() == existing().likes.size() - 1 && existing().likes.hasAll(incoming().likes)) ) ) ||
+        
+        // Action 2: Administrator toggles adminLikes which highlights the username
+        (incoming().diff(existing()).affectedKeys().hasOnly(['adminLikes']) && isAdmin() &&
+         ( (incoming().adminLikes.size() == existing().adminLikes.size() + 1 && incoming().adminLikes.hasAll(existing().adminLikes) && incoming().adminLikes.hasAny([request.auth.uid])) || 
+           (incoming().adminLikes.size() == existing().adminLikes.size() - 1 && existing().adminLikes.hasAll(incoming().adminLikes)) ) ) ||
+        
+        // Action 3: Creator updating their own text or Admin overriding
+        (isOwner(existing().userId) && isValidFeedback(incoming()) && incoming().diff(existing()).affectedKeys().hasOnly(['text'])) ||
+        isAdmin()
+      );
+      
+      allow delete: if isSignedIn() && (isOwner(existing().userId) || isAdmin());
+    }
+
+    // Pillar 2: Validation Blueprints for Diagnostics History
+    function isValidDiagnosis(data) {
+      return data.id is string && data.id.size() <= 128 &&
+             data.userId is string && data.userId == request.auth.uid &&
+             data.cropName is string && data.cropName.size() <= 120 &&
+             data.diseaseName is string && data.diseaseName.size() <= 200 &&
+             data.diseaseType is string && (data.diseaseType == "Fungal" || data.diseaseType == "Bacterial" || data.diseaseType == "Viral" || data.diseaseType == "Pest" || data.diseaseType == "Healthy") &&
+             data.confidence is number && data.confidence >= 0.0 && data.confidence <= 1.0 &&
+             data.severity is string && (data.severity == "Low" || data.severity == "Medium" || data.severity == "High") &&
+             data.symptoms is list && data.treatment is list && data.preventiveMeasures is list;
+    }
+
+    match /diagnostics/{diagnosisId} {
+      allow get: if isSignedIn() && (isOwner(existing().userId) || isAdmin());
+      allow list: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isSignedIn() && isValidId(diagnosisId) && isValidDiagnosis(incoming());
+      allow update: if isSignedIn() && isOwner(existing().userId) && isValidDiagnosis(incoming());
+      allow delete: if isSignedIn() && (isOwner(existing().userId) || isAdmin());
+    }
+  }
+}

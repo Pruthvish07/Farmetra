@@ -1,9 +1,10 @@
 import { motion } from 'motion/react';
-import { Home, Camera, History, User, Settings, Book, Sun, Moon } from 'lucide-react';
+import { Home, Camera, History, User, Settings, Book, Sun, Moon, MessageSquare } from 'lucide-react';
 import { ReactNode } from 'react';
 import { USER_NAME } from '../../constants';
 import { cn } from '../../lib/utils';
 import logoImg from '../../assets/images/farmetra_logo_1780246757391.png';
+import { useLanguage } from '../../lib/LanguageContext';
 
 interface LayoutProps {
   children: ReactNode;
@@ -14,12 +15,15 @@ interface LayoutProps {
 }
 
 export default function Layout({ children, activeTab, onTabChange, isDarkMode, onToggleTheme }: LayoutProps) {
+  const { t } = useLanguage();
+
   // Mobile/Desktop navigation paths matching Mockup 2
   const sidebarTabs = [
-    { id: 'dashboard', icon: Home, label: 'Home Dashboard' },
-    { id: 'guide', icon: Book, label: 'Crop Guide' },
-    { id: 'history', icon: History, label: 'Analysis History' },
-    { id: 'profile', icon: User, label: 'Admin Access' },
+    { id: 'dashboard', icon: Home, label: t('home') },
+    { id: 'guide', icon: Book, label: t('guide') },
+    { id: 'history', icon: History, label: t('history') },
+    { id: 'forum', icon: MessageSquare, label: t('communityFeedback') },
+    { id: 'profile', icon: User, label: t('profile') },
   ];
 
   return (
@@ -54,11 +58,11 @@ export default function Layout({ children, activeTab, onTabChange, isDarkMode, o
       )}>
         {/* App Logo and Title banner */}
         <div className="p-8 flex items-center gap-3">
-          <div className="w-12 h-12 flex items-center justify-center rounded-2xl overflow-hidden shadow-xl shadow-emerald-200/20 transform -rotate-3 border border-emerald-500/10 hover:rotate-0 transition-transform duration-300 shrink-0 bg-white">
+          <div className="w-12 h-12 relative rounded-2xl overflow-hidden shadow-xl shadow-emerald-200/20 transform -rotate-3 hover:rotate-0 transition-transform duration-300 shrink-0">
             <img 
               src={logoImg} 
               alt="Farmetra Logo" 
-              className="w-full h-full object-cover" 
+              className="absolute inset-0 w-full h-full object-cover block" 
               referrerPolicy="no-referrer" 
             />
           </div>
@@ -68,7 +72,7 @@ export default function Layout({ children, activeTab, onTabChange, isDarkMode, o
               isDarkMode ? "text-white" : "text-[#1B4332]"
             )}>Farmetra</h1>
             <span className="text-[9px] text-[#8E9299] font-black uppercase tracking-widest block pt-1">
-              DETECT. PROTECT. GROW.
+              {t('detectProtectGrow')}
             </span>
           </div>
         </div>
@@ -150,7 +154,7 @@ export default function Layout({ children, activeTab, onTabChange, isDarkMode, o
                  "text-lg font-black tracking-tight leading-none text-[#1B4332] dark:text-white"
                )}>Farmetra</h1>
                <span className="text-[7px] text-[#8E9299] font-black uppercase tracking-wider block">
-                 DETECT. PROTECT. GROW.
+                 {t('detectProtectGrow')}
                </span>
              </div>
           </div>
@@ -165,7 +169,7 @@ export default function Layout({ children, activeTab, onTabChange, isDarkMode, o
               placeholder="Search diseases, crops or nutrients..." 
               className={cn(
                 "bg-transparent text-xs font-bold outline-none w-full",
-                isDarkMode ? "text-white placeholder:text-slate-600" : "text-slate-700"
+                isDarkMode ? "text-white placeholder:text-slate-650" : "text-slate-700"
               )}
             />
           </div>
@@ -178,8 +182,8 @@ export default function Layout({ children, activeTab, onTabChange, isDarkMode, o
                 ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20 shadow-inner" 
                 : "bg-emerald-50 text-emerald-700 border-emerald-100 shadow-sm"
             )}>
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-              Offline High-Performance Sync
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-505 animate-pulse"></span>
+              {t('syncStatus')}
             </span>
           </div>
         </header>
@@ -204,7 +208,7 @@ export default function Layout({ children, activeTab, onTabChange, isDarkMode, o
             ? "bg-[#111814] text-emerald-400/50 border-emerald-900/30" 
             : "bg-emerald-50 text-emerald-950/60 border-emerald-100"
         )}>
-          <p>Local CNN Database: active (PlantVillage Sync v4) • 0 SEC LATENCY</p>
+          <p>{t('localCnnDb')}</p>
           <p>© 2026 Farmetra Agri-Intelligence • Secure Admin: {USER_NAME}</p>
         </footer>
 
@@ -224,7 +228,7 @@ export default function Layout({ children, activeTab, onTabChange, isDarkMode, o
             )}
           >
             <Home size={18} strokeWidth={activeTab === 'dashboard' ? 2.5 : 2} />
-            <span className="text-[8px] font-extrabold uppercase tracking-widest">Home</span>
+            <span className="text-[8px] font-extrabold uppercase tracking-widest">{t('home')}</span>
           </button>
 
           {/* Item 2: Diagnostic History */}
@@ -238,7 +242,7 @@ export default function Layout({ children, activeTab, onTabChange, isDarkMode, o
             )}
           >
             <History size={18} strokeWidth={activeTab === 'history' ? 2.5 : 2} />
-            <span className="text-[8px] font-extrabold uppercase tracking-widest">History</span>
+            <span className="text-[8px] font-extrabold uppercase tracking-widest">{t('history')}</span>
           </button>
 
           {/* Item 3: Raised Circular Scanner Camera Trigger (Center button mockup 2) */}
@@ -252,7 +256,7 @@ export default function Layout({ children, activeTab, onTabChange, isDarkMode, o
             >
               <Camera size={22} strokeWidth={2.5} />
             </button>
-            <span className="text-[8px] font-extrabold uppercase tracking-widest text-slate-400 dark:text-slate-600 absolute bottom-0.5">Scan</span>
+            <span className="text-[8px] font-extrabold uppercase tracking-widest text-slate-400 dark:text-slate-600 absolute bottom-0.5">{t('scan')}</span>
           </div>
 
           {/* Item 4: Agronomy Guide */}
@@ -266,7 +270,7 @@ export default function Layout({ children, activeTab, onTabChange, isDarkMode, o
             )}
           >
             <Book size={18} strokeWidth={activeTab === 'guide' ? 2.5 : 2} />
-            <span className="text-[8px] font-extrabold uppercase tracking-widest">Guide</span>
+            <span className="text-[8px] font-extrabold uppercase tracking-widest">{t('guide')}</span>
           </button>
 
           {/* Item 5: Administration Profile */}
@@ -280,7 +284,7 @@ export default function Layout({ children, activeTab, onTabChange, isDarkMode, o
             )}
           >
             <User size={18} strokeWidth={activeTab === 'profile' ? 2.5 : 2} />
-            <span className="text-[8px] font-extrabold uppercase tracking-widest">Profile</span>
+            <span className="text-[8px] font-extrabold uppercase tracking-widest">{t('profile')}</span>
           </button>
         </nav>
       </div>

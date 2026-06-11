@@ -1,0 +1,68 @@
+{
+  "entities": {
+    "userProfile": {
+      "title": "UserProfile",
+      "description": "User account schema representing farmers, experts, and administrators in the system.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "The unique Firebase Auth UID of the user." },
+        "displayName": { "type": "string", "description": "Human-readable display name of the user." },
+        "email": { "type": "string", "description": "Verified email address of the authenticated user." },
+        "role": { "type": "string", "enum": ["Farmer", "Expert", "Admin"], "description": "System privilege role assigned to user." },
+        "language": { "type": "string", "enum": ["en", "hi", "kn"], "description": "User chosen regional language setting." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Timestamp when the user profile was created." }
+      },
+      "required": ["uid", "displayName", "email", "role", "language", "createdAt"]
+    },
+    "feedback": {
+      "title": "Feedback",
+      "description": "Community user submission feedback containing crop health reviews, with like counts, and admin certifications.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique identifier of the feedback submission." },
+        "userId": { "type": "string", "description": "User UID of the feedback author." },
+        "userName": { "type": "string", "description": "Name of the feedback author." },
+        "userEmail": { "type": "string", "description": "Email of the author for admin review." },
+        "text": { "type": "string", "description": "Text description of feedback or question." },
+        "timestamp": { "type": "string", "format": "date-time", "description": "Server authenticated creation time." },
+        "likes": { "type": "array", "description": "List of user UIDs who have liked this feedback." },
+        "adminLikes": { "type": "array", "description": "List of administrator UIDs who have liked this, which triggers username highlight." }
+      },
+      "required": ["id", "userId", "userName", "userEmail", "text", "timestamp", "likes", "adminLikes"]
+    },
+    "diagnosis": {
+      "title": "Diagnosis",
+      "description": "Durable record of a CNN plant scan result.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique identifier of the scan." },
+        "userId": { "type": "string", "description": "Owner userId of the scan." },
+        "timestamp": { "type": "string", "format": "date-time", "description": "Timestamp when diagnosis occurred." },
+        "imageUrl": { "type": "string", "description": "Base64 encoded or hosted image of the crop." },
+        "cropName": { "type": "string", "description": "Identified name of the crop." },
+        "diseaseName": { "type": "string", "description": "Name of diagnosed plant disease." },
+        "diseaseType": { "type": "string", "enum": ["Fungal", "Bacterial", "Viral", "Pest", "Healthy"], "description": "Classification group." },
+        "confidence": { "type": "number", "description": "AI model accuracy probability." },
+        "severity": { "type": "string", "enum": ["Low", "Medium", "High"], "description": "Criticality level of threat." },
+        "symptoms": { "type": "array", "description": "Identified warning signs." },
+        "treatment": { "type": "array", "description": "Remediation treatment steps." },
+        "preventiveMeasures": { "type": "array", "description": "Preventive best practices." }
+      },
+      "required": ["id", "userId", "timestamp", "imageUrl", "cropName", "diseaseName", "diseaseType", "confidence", "severity", "symptoms", "treatment", "preventiveMeasures"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "userProfile",
+      "description": "Stores user profiles with secure role information."
+    },
+    "/feedbacks/{feedbackId}": {
+      "schema": "feedback",
+      "description": "Community feedback submissions accessible globally to authenticated participants."
+    },
+    "/diagnostics/{diagnosisId}": {
+      "schema": "diagnosis",
+      "description": "Historical diagnosis records indexed by user ID for persistent cloud tracking."
+    }
+  }
+}

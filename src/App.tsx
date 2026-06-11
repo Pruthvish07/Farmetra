@@ -5,10 +5,13 @@ import CameraScreen from './components/camera/CameraScreen';
 import DiagnosisResult from './components/diagnosis/DiagnosisResult';
 import CropGuide from './components/guide/CropGuide';
 import SplashScreen from './components/layout/SplashScreen';
+import CommunityFeedback from './components/feedback/CommunityFeedback';
 import { Diagnosis } from './types';
-import { Settings, User, Globe, Shield, Sun, Moon, Calendar, FileText } from 'lucide-react';
+import { Settings, User, Globe, Shield, Sun, Moon, Calendar, FileText, ChevronRight } from 'lucide-react';
 import { USER_NAME } from './constants';
 import { cn } from './lib/utils';
+import { useAuth } from './lib/AuthContext';
+import { useLanguage } from './lib/LanguageContext';
 
 // Seed sample diagnosis histories to prevent empty states on first run, matching mockup details!
 const sampleDetections: Diagnosis[] = [
@@ -63,14 +66,31 @@ const sampleDetections: Diagnosis[] = [
 ];
 
 export default function App() {
+  const { user, profile, login, logout } = useAuth();
+  const { language, setLanguage, t } = useLanguage();
   const [isLoaded, setIsLoaded] = useState(false);
   const [activeTab, setActiveTab] = useState('dashboard');
   const [showCamera, setShowCamera] = useState(false);
   const [currentDiagnosis, setCurrentDiagnosis] = useState<Diagnosis | null>(null);
   const [diagnosisHistory, setDiagnosisHistory] = useState<Diagnosis[]>([]);
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
+    const saved = localStorage.getItem('isDarkMode');
+    return saved !== null ? JSON.parse(saved) : true;
+  });
 
   const toggleTheme = () => setIsDarkMode(!isDarkMode);
+
+  // Persist dark mode settings to localStorage
+  useEffect(() => {
+    localStorage.setItem('isDarkMode', JSON.stringify(isDarkMode));
+  }, [isDarkMode]);
+
+  // Synchronize Firestore profile selected language to the active Language Context
+  useEffect(() => {
+    if (profile?.language) {
+      setLanguage(profile.language);
+    }
+  }, [profile]);
 
   // Local storage persistence combined with seed defaults
   useEffect(() => {
@@ -106,12 +126,18 @@ export default function App() {
         );
       case 'guide':
         return <CropGuide />;
+      case 'forum':
+        return (
+          <div className="p-6 md:p-8 max-w-4xl mx-auto pb-24">
+            <CommunityFeedback />
+          </div>
+        );
       case 'history':
         return (
           <div className="p-6 pb-24 max-w-4xl mx-auto space-y-6">
             <div className="space-y-1 text-left">
               <h2 className="text-2xl font-black tracking-tighter uppercase text-[#1B4332] dark:text-white flex items-center gap-2">
-                <FileText size={24} className="text-emerald-600" /> Pathogen Registry Log
+                <FileText size={24} className="text-emerald-600" /> {t('history')}
               </h2>
               <p className="text-slate-400 text-xs font-bold uppercase tracking-widest leading-relaxed">
                 Review and inspect all previous neural analysis reports captured on-site
@@ -151,7 +177,7 @@ export default function App() {
               ) : (
                 <div className="py-24 text-center bg-white dark:bg-white/5 rounded-3xl border border-[#E5E5E5]">
                   <p className="text-slate-400 text-xs font-bold uppercase tracking-widest leading-normal">
-                    No active diagnostics registry records captured.
+                    {t('noDetections')}
                   </p>
                 </div>
               )}
@@ -159,28 +185,95 @@ export default function App() {
           </div>
         );
       case 'profile':
+        const avatarName = user ? (user.displayName || user.email || "Farmer") : USER_NAME;
+        const initials = avatarName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+
         return (
-          <div className="p-6 md:p-12 max-w-2xl mx-auto space-y-8 pb-24 relative z-10 transition-colors">
+          <div className="p-6 md:p-12 max-w-2xl mx-auto space-y-8 pb-24 relative z-10 transition-colors text-left">
             <div className="bg-white dark:bg-white/5 rounded-[32px] p-8 shadow-sm border border-emerald-50 dark:border-white/10 flex flex-col items-center text-center">
-              <div className="w-24 h-24 rounded-full bg-[#1B4332] flex items-center justify-center text-white text-3xl font-black mb-6 ring-8 ring-emerald-50 dark:ring-emerald-900/20 shadow-xl">
-                {USER_NAME.split(' ').map(n => n[0]).join('').substring(0, 2)}
+              <div className="w-24 h-24 rounded-full bg-[#1B4332] flex items-center justify-center text-white text-3xl font-black mb-6 ring-8 ring-emerald-50 dark:ring-emerald-900/20 shadow-xl overflow-hidden">
+                {user?.photoURL ? (
+                  <img src={user.photoURL} alt="Profile" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                ) : (
+                  initials
+                )}
               </div>
-              <h2 className="text-2xl font-black text-[#1B4332] dark:text-white tracking-tighter uppercase">{USER_NAME}</h2>
-              <p className="text-xs font-bold text-emerald-600 uppercase tracking-[0.2em] mt-1">Senior Agronomist & Admin</p>
-              <div className="mt-6 flex gap-3">
-                 <span className="bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 px-3 py-1 rounded-full text-[10px] font-black border border-emerald-100 dark:border-emerald-500/20">AGENT CLEARANCE: L4</span>
-                 <span className="bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 px-3 py-1 rounded-full text-[10px] font-black border border-blue-100 dark:border-blue-500/20">REGIONAL DEV DIRECTOR</span>
-              </div>
+              <h2 className="text-2xl font-black text-[#1B4332] dark:text-white tracking-tighter uppercase">
+                {user ? (user.displayName || "Farmer Participant") : USER_NAME}
+              </h2>
+              <p className="text-xs font-bold text-emerald-600 uppercase tracking-[0.2em] mt-1">
+                {profile?.role === "Admin" ? "System Administrator" : profile?.role === "Expert" ? "Expert Consultant" : "Community Farmer Member"}
+              </p>
+              
+              {user ? (
+                <div className="mt-6 flex flex-col items-center gap-3">
+                  <span className="text-xs font-semibold text-slate-400">{user.email}</span>
+                  <button 
+                    onClick={logout}
+                    className="bg-red-50 hover:bg-red-155 text-red-750 px-5 py-2.5 rounded-2xl font-black uppercase text-[10px] tracking-wider transition-all cursor-pointer"
+                  >
+                    {t('signOut')}
+                  </button>
+                </div>
+              ) : (
+                <div className="mt-6 flex flex-col items-center gap-4">
+                  <p className="text-xs text-slate-450 font-semibold">{t('notSignedIn')}</p>
+                  <button 
+                    onClick={login}
+                    className="bg-[#1B4332] hover:bg-emerald-800 text-white px-5 py-3 rounded-2xl font-black uppercase text-[10px] tracking-wider transition-all shadow cursor-pointer"
+                  >
+                    {t('signInWithGoogle')}
+                  </button>
+                </div>
+              )}
             </div>
 
             <div className="space-y-4">
-              <h3 className="text-[10px] uppercase tracking-[0.3em] font-black text-slate-400 px-6">System Access Control</h3>
+              <h3 className="text-[10px] uppercase tracking-[0.3em] font-black text-slate-400 px-6">{t('adminAccessControl')}</h3>
               <div className="bg-white dark:bg-white/5 rounded-[32px] overflow-hidden border border-emerald-50 dark:border-white/10 shadow-sm">
-                <ProfileItem icon={Shield} label="Admin Dashboard" value="Secured" highlight />
+                <ProfileItem icon={Shield} label={t('adminDashboard')} value={t('secured')} highlight />
                 <div className="h-px bg-slate-50 dark:bg-emerald-900/10 mx-6" />
-                <ProfileItem icon={Globe} label="Regional Language" value="Multi-Language (EN/HI/KN)" />
+                
+                {/* Real-time Language Trigger Selector */}
+                <div className="p-6 space-y-3 bg-slate-50/[0.05]">
+                  <div className="flex items-center gap-4 text-xs font-black text-[#1B4332] dark:text-white uppercase tracking-widest">
+                    <Globe size={18} className="text-emerald-600" />
+                    <span>{t('languageSelect')}</span>
+                  </div>
+                  
+                  <div className="grid grid-cols-3 gap-3 pt-2">
+                    {[
+                      { code: 'en', name: 'English' },
+                      { code: 'hi', name: 'हिन्दी (Hi)' },
+                      { code: 'kn', name: 'ಕನ್ನಡ (Kn)' }
+                    ].map((lang) => (
+                      <button
+                        key={lang.code}
+                        type="button"
+                        onClick={async () => {
+                          setLanguage(lang.code);
+                          if (user) {
+                            const { doc, updateDoc } = await import("firebase/firestore");
+                            const { db } = await import("./lib/firebase");
+                            const userDocRef = doc(db, "users", user.uid);
+                            await updateDoc(userDocRef, { language: lang.code });
+                          }
+                        }}
+                        className={cn(
+                          "px-3 py-3 rounded-xl font-bold text-center text-[10px] uppercase tracking-wider transition-all cursor-pointer",
+                          language === lang.code
+                            ? "bg-[#1B4332] text-white shadow-md font-extrabold"
+                            : "bg-slate-50 dark:bg-white/5 text-slate-500 hover:bg-slate-100"
+                        )}
+                      >
+                        {lang.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
                 <div className="h-px bg-slate-50 dark:bg-emerald-900/10 mx-6" />
-                <ProfileItem icon={Settings} label="CNN Engine Config" value="v4.2 Optimized" />
+                <ProfileItem icon={Settings} label={t('engineConfig')} value={t('v4optimized')} />
                 <div className="h-px bg-slate-50 dark:bg-emerald-900/10 mx-6" />
                 <ProfileItem 
                   icon={isDarkMode ? Sun : Moon} 
@@ -195,7 +288,7 @@ export default function App() {
                 <div className="relative z-10 text-left">
                     <h4 className="text-xs font-black uppercase tracking-[0.2em] text-[#83f369] mb-2">Cloud Connectivity Mode</h4>
                     <p className="text-xs opacity-70 leading-relaxed font-medium italic">
-                        Farmetra active buffer is currently in high-performance offline mode. Pathogen signatures are being cached locally for intermittent sync.
+                        Farmetra active buffer is dynamically persisted to Google Cloud Firestore. Feedbacks, custom comments, and like metrics are fully secured and synchronized globally.
                     </p>
                 </div>
                 <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-emerald-900 rounded-full opacity-30" />
@@ -240,14 +333,20 @@ export default function App() {
       {showCamera && (
         <CameraScreen 
           onDiagnosisComplete={handleDiagnosisComplete} 
-          onCancel={() => setShowCamera(false)} 
+          onCancel={() => {
+            setShowCamera(false);
+            setActiveTab('dashboard');
+          }} 
         />
       )}
 
       {currentDiagnosis && (
         <DiagnosisResult 
           diagnosis={currentDiagnosis} 
-          onClose={() => setCurrentDiagnosis(null)} 
+          onClose={() => {
+            setCurrentDiagnosis(null);
+            setActiveTab('dashboard');
+          }} 
         />
       )}
     </Layout>
@@ -273,5 +372,3 @@ function ProfileItem({ icon: Icon, label, value, highlight, onClick }: { icon: a
     </button>
   );
 }
-
-import { ChevronRight } from 'lucide-react';
