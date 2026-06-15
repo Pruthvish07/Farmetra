@@ -17,7 +17,7 @@ interface LayoutProps {
 
 export default function Layout({ children, activeTab, onTabChange, isDarkMode, onToggleTheme }: LayoutProps) {
   const { t } = useLanguage();
-  const { login, logout } = useAuth();
+  const { login, loginWithRedirect, logout, authError } = useAuth();
 
   // Mobile/Desktop navigation paths matching Mockup 2
   const sidebarTabs = [
@@ -184,19 +184,26 @@ export default function Layout({ children, activeTab, onTabChange, isDarkMode, o
             </span>
 
             {/* Separately rendered Sign In & Sign Out actions at the top right */}
-            <div className="flex items-center gap-2">
-              <button
-                onClick={login}
-                className="px-3 md:px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all duration-200 active:scale-95 shadow-md shadow-emerald-950/10 cursor-pointer border border-emerald-500/10 bg-emerald-600 hover:bg-emerald-700 text-white"
-              >
-                Sign In
-              </button>
-              <button
-                onClick={logout}
-                className="px-3 md:px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all duration-200 active:scale-95 shadow-md shadow-red-950/10 cursor-pointer border border-red-500/10 bg-red-600 hover:bg-red-700 text-white"
-              >
-                Sign Out
-              </button>
+            <div className="flex flex-col items-end gap-1">
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={loginWithRedirect}
+                  className="px-3 md:px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all duration-200 active:scale-95 shadow-md shadow-emerald-950/10 cursor-pointer border border-emerald-500/10 bg-emerald-600 hover:bg-emerald-700 text-white"
+                >
+                  Sign In
+                </button>
+                <button
+                  onClick={logout}
+                  className="px-3 md:px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all duration-200 active:scale-95 shadow-md shadow-red-950/10 cursor-pointer border border-red-500/10 bg-red-600 hover:bg-red-700 text-white"
+                >
+                  Sign Out
+                </button>
+              </div>
+              {authError && (
+                <span className="text-[8px] text-red-400 font-bold block max-w-[150px] truncate" title={authError}>
+                  {authError}
+                </span>
+              )}
             </div>
           </div>
         </header>

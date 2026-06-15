@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
-import { User, signInWithPopup, signOut as firebaseSignOut, onAuthStateChanged } from "firebase/auth";
+import { User, signInWithPopup, signInWithRedirect, getRedirectResult, signOut as firebaseSignOut, onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { auth, db, googleProvider, handleFirestoreError, OperationType } from "./firebase";
 import { UserProfile } from "../types";
@@ -8,7 +8,9 @@ interface AuthContextType {
   user: User | null;
   profile: UserProfile | null;
   loading: boolean;
+  authError: string | null;
   login: () => Promise<void>;
+  loginWithRedirect: () => Promise<void>;
   loginWithUsername: (username: string, language: string, role?: 'Farmer' | 'Expert' | 'Admin') => Promise<void>;
   logout: () => Promise<void>;
   updateLanguageSetting: (lang: string) => Promise<void>;
@@ -21,6 +23,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [authError, setAuthError] = useState<string | null>(null);
+
+  // Handle redirect result on page load/redirect return
+  useEffect(() => {
+    const handleRedirectResult = async () => {
+      try {
+        setLoading(true);
+        const result = await getRedirectResult(auth);
+        if (result?.user) {
+          console.log("Successfully signed in via redirect:", result.user.email);
+        }
+      } catch (err: any) {
+        console.error("Firebase Auth Redirect processing error:", err);
+        setAuthError(err.message || "Google Redirect Sign-In failure");
+      } finally {
+        setLoading(false);
+      }
+    };
+    handleRedirectResult();
+  }, []);
 
   // Synchronizes auth state and user profile
   useEffect(() => {
@@ -86,6 +108,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await signInWithPopup(auth, googleProvider);
     } catch (error) {
       console.error("Google Authentication entry error:", error);
+      throw error;
+    }
+  };
+
+  const loginWithRedirect = async () => {
+    try {
+      setLoading(true);
+      setAuthError(null);
+      await signInWithRedirect(auth, googleProvider);
+    } catch (error: any) {
+      console.error("Google Authentication Redirect initiation error:", error);
+      setAuthError(error.message || "Could not launch Google Sign-In redirect");
+      setLoading(false);
       throw error;
     }
   };
@@ -198,7 +233,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, profile, loading, login, loginWithUsername, logout, updateLanguageSetting, updateProfileData }}>
+    <AuthContext.Provider value={{ user, profile, loading, authError, login, loginWithRedirect, loginWithUsername, logout, updateLanguageSetting, updateProfileData }}>
       {children}
     </AuthContext.Provider>
   );

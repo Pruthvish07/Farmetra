@@ -6,7 +6,7 @@ import { cn } from "../../lib/utils";
 import { motion, AnimatePresence } from "motion/react";
 
 export default function AuthGate({ children }: { children: React.ReactNode }) {
-  const { user, profile, loading, login, loginWithUsername, updateProfileData } = useAuth();
+  const { user, profile, loading, loginWithRedirect, loginWithUsername, updateProfileData } = useAuth();
   const { language, setLanguage, t } = useLanguage();
   
   // Local UI states
@@ -117,13 +117,9 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
                 onClick={async () => {
                   setError(null);
                   try {
-                    await login();
+                    await loginWithRedirect();
                   } catch (e: any) {
-                    if (e.message?.includes("popup-closed-by-user") || e.code?.includes("popup-closed")) {
-                      setError("Sign in popup closed by user.");
-                    } else {
-                      setError("Google Popup restricted. Use Sandbox Quick-Access fallback below.");
-                    }
+                    setError(e.message || "Google Redirect restricted. Use Sandbox Quick-Access fallback below.");
                   }
                 }}
                 className="w-full py-4 px-6 bg-white text-[#080B09] hover:bg-slate-100 rounded-2xl font-black text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-3 shadow-lg active:scale-98 cursor-pointer"

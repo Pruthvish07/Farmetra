@@ -18,7 +18,7 @@ export interface FeedbackItem {
 }
 
 export default function CommunityFeedback() {
-  const { user, profile, login } = useAuth();
+  const { user, profile, loginWithRedirect } = useAuth();
   const { t } = useLanguage();
   const [feedbacks, setFeedbacks] = useState<FeedbackItem[]>([]);
   const [newText, setNewText] = useState("");
@@ -188,7 +188,7 @@ export default function CommunityFeedback() {
             {t("notSignedIn")}
           </p>
           <button
-            onClick={login}
+            onClick={loginWithRedirect}
             className="px-6 py-3 bg-[#1B4332] hover:bg-[#123023] text-white font-black uppercase text-xs tracking-wider rounded-2xl transition-all shadow-md inline-flex items-center gap-2"
           >
             {t("signInWithGoogle")}
