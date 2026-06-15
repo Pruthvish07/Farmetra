@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Heart, Star, Send, Loader2, MessageSquare, AlertCircle } from "lucide-react";
-import { collection, query, orderBy, onSnapshot, doc, addDoc, updateDoc, deleteDoc } from "firebase/firestore";
+import { collection, query, orderBy, onSnapshot, doc, setDoc, updateDoc, deleteDoc } from "firebase/firestore";
 import { db, handleFirestoreError, OperationType } from "../../lib/firebase";
 import { useAuth } from "../../lib/AuthContext";
 import { useLanguage } from "../../lib/LanguageContext";
@@ -79,7 +79,9 @@ export default function CommunityFeedback() {
     const path = "feedbacks";
 
     try {
+      const docRef = doc(collection(db, "feedbacks"));
       const payload = {
+        id: docRef.id,
         userId: user.uid,
         userName: user.displayName || user.email?.split("@")[0] || "Farmer Participant",
         userEmail: user.email || "",
@@ -89,7 +91,7 @@ export default function CommunityFeedback() {
         adminLikes: [],
       };
 
-      await addDoc(collection(db, "feedbacks"), payload);
+      await setDoc(docRef, payload);
       setNewText("");
     } catch (err) {
       console.error("Error creating feedback doc:", err);
