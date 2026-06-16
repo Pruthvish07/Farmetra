@@ -349,44 +349,42 @@ export default function App() {
   }
 
   return (
-    <AuthGate>
-      <Layout 
-        activeTab={showCamera ? 'camera' : activeTab} 
-        onTabChange={(tab) => {
-          if (tab === 'camera') {
-            setShowCamera(true);
-          } else {
-            setActiveTab(tab);
+    <Layout 
+      activeTab={showCamera ? 'camera' : activeTab} 
+      onTabChange={(tab) => {
+        if (tab === 'camera') {
+          setShowCamera(true);
+        } else {
+          setActiveTab(tab);
+          setShowCamera(false);
+          setCurrentDiagnosis(null);
+        }
+      }}
+      isDarkMode={isDarkMode}
+      onToggleTheme={toggleTheme}
+    >
+      {renderContent()}
+      
+      {showCamera && (
+        <CameraScreen 
+          onDiagnosisComplete={handleDiagnosisComplete} 
+          onCancel={() => {
             setShowCamera(false);
-            setCurrentDiagnosis(null);
-          }
-        }}
-        isDarkMode={isDarkMode}
-        onToggleTheme={toggleTheme}
-      >
-        {renderContent()}
-        
-        {showCamera && (
-          <CameraScreen 
-            onDiagnosisComplete={handleDiagnosisComplete} 
-            onCancel={() => {
-              setShowCamera(false);
-              setActiveTab('dashboard');
-            }} 
-          />
-        )}
+            setActiveTab('dashboard');
+          }} 
+        />
+      )}
 
-        {currentDiagnosis && (
-          <DiagnosisResult 
-            diagnosis={currentDiagnosis} 
-            onClose={() => {
-              setCurrentDiagnosis(null);
-              setActiveTab('dashboard');
-            }} 
-          />
-        )}
-      </Layout>
-    </AuthGate>
+      {currentDiagnosis && (
+        <DiagnosisResult 
+          diagnosis={currentDiagnosis} 
+          onClose={() => {
+            setCurrentDiagnosis(null);
+            setActiveTab('dashboard');
+          }} 
+        />
+      )}
+    </Layout>
   );
 }
 

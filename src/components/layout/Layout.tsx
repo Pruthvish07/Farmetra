@@ -1,11 +1,12 @@
 import { motion } from 'motion/react';
 import { Home, Camera, History, User, Settings, Book, Sun, Moon, MessageSquare } from 'lucide-react';
-import { ReactNode } from 'react';
+import { ReactNode, useState } from 'react';
 import { USER_NAME } from '../../constants';
 import { cn } from '../../lib/utils';
 import logoImg from '../../assets/images/farmetra_logo_1780246757391.png';
 import { useLanguage } from '../../lib/LanguageContext';
 import { useAuth } from '../../lib/AuthContext';
+import LoginModal from '../auth/LoginModal';
 
 interface LayoutProps {
   children: ReactNode;
@@ -17,7 +18,8 @@ interface LayoutProps {
 
 export default function Layout({ children, activeTab, onTabChange, isDarkMode, onToggleTheme }: LayoutProps) {
   const { t } = useLanguage();
-  const { login, loginWithRedirect, logout, authError } = useAuth();
+  const { user, profile, logout } = useAuth();
+  const [isSignInOpen, setIsSignInOpen] = useState(false);
 
   // Mobile/Desktop navigation paths matching Mockup 2
   const sidebarTabs = [
@@ -119,12 +121,14 @@ export default function Layout({ children, activeTab, onTabChange, isDarkMode, o
         <div className="p-6 mt-auto border-t border-emerald-500/5 text-left opacity-35 hover:opacity-80 transition-opacity">
           <div className="flex items-center gap-2 mb-1">
             <div className="w-5 h-5 rounded bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-black text-[8px] uppercase">
-              {USER_NAME.split(' ').map(n => n[0]).join('').substring(0, 2)}
+              {(profile?.displayName || user?.displayName || USER_NAME).split(' ').map(n => n[0]).join('').substring(0, 2)}
             </div>
-            <p className="text-[9px] font-black truncate uppercase tracking-widest text-[#8E9299]">{USER_NAME}</p>
+            <p className="text-[9px] font-black truncate uppercase tracking-widest text-[#8E9299]">
+              {profile?.displayName || user?.displayName || USER_NAME}
+            </p>
           </div>
           <span className="text-[7px] text-[#8E9299] font-black uppercase tracking-widest block pl-7">
-            System Administrator • secure portal
+            {profile?.role === "Admin" ? "System Administrator" : profile?.role === "Expert" ? "Expert Consultant" : profile?.role === "Farmer" ? "Community Farmer" : "Guest Participant"} • secure mode
           </span>
         </div>
       </aside>
@@ -183,26 +187,32 @@ export default function Layout({ children, activeTab, onTabChange, isDarkMode, o
               {t('syncStatus')}
             </span>
 
-            {/* Separately rendered Sign In & Sign Out actions at the top right */}
-            <div className="flex flex-col items-end gap-1">
-              <div className="flex items-center gap-2">
+            {/* Sign In & Sign Out actions based on current Auth State */}
+            <div className="flex items-center gap-2">
+              {user ? (
+                <div className="flex items-center gap-3">
+                  <div className="hidden md:flex flex-col items-end text-right">
+                    <span className="text-[10px] font-black uppercase tracking-wider text-[#1B4332] dark:text-white">
+                      {profile?.displayName || user.displayName || "Farmer"}
+                    </span>
+                    <span className="text-[8px] text-[#8E9299] font-bold uppercase tracking-widest">
+                      {profile?.role === "Admin" ? "Admin" : profile?.role === "Expert" ? "Expert" : "Farmer"}
+                    </span>
+                  </div>
+                  <button
+                    onClick={logout}
+                    className="px-3 md:px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all duration-200 active:scale-95 shadow-md shadow-red-950/10 cursor-pointer border border-red-500/10 bg-red-600 hover:bg-red-700 text-white"
+                  >
+                    Sign Out
+                  </button>
+                </div>
+              ) : (
                 <button
-                  onClick={loginWithRedirect}
+                  onClick={() => setIsSignInOpen(true)}
                   className="px-3 md:px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all duration-200 active:scale-95 shadow-md shadow-emerald-950/10 cursor-pointer border border-emerald-500/10 bg-emerald-600 hover:bg-emerald-700 text-white"
                 >
                   Sign In
                 </button>
-                <button
-                  onClick={logout}
-                  className="px-3 md:px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all duration-200 active:scale-95 shadow-md shadow-red-950/10 cursor-pointer border border-red-500/10 bg-red-600 hover:bg-red-700 text-white"
-                >
-                  Sign Out
-                </button>
-              </div>
-              {authError && (
-                <span className="text-[8px] text-red-400 font-bold block max-w-[150px] truncate" title={authError}>
-                  {authError}
-                </span>
               )}
             </div>
           </div>
@@ -308,6 +318,9 @@ export default function Layout({ children, activeTab, onTabChange, isDarkMode, o
           </button>
         </nav>
       </div>
+
+      {/* Login modal overlay */}
+      <LoginModal isOpen={isSignInOpen} onClose={() => setIsSignInOpen(false)} />
     </div>
   );
 }
