@@ -12,7 +12,6 @@ import { USER_NAME } from './constants';
 import { cn } from './lib/utils';
 import { useAuth } from './lib/AuthContext';
 import { useLanguage } from './lib/LanguageContext';
-import AuthGate from './components/auth/AuthGate';
 
 // Seed sample diagnosis histories to prevent empty states on first run, matching mockup details!
 const sampleDetections: Diagnosis[] = [
@@ -105,62 +104,12 @@ export default function App() {
     }
   }, []);
 
-  // Load real diagnostics from Firestore when securely authenticated
-  useEffect(() => {
-    if (!user || user.uid.startsWith("offline_user_")) return;
-
-    const loadFirestoreDiagnostics = async () => {
-      try {
-        const { collection, query, where, getDocs } = await import("firebase/firestore");
-        const { db } = await import("./lib/firebase");
-        
-        const q = query(
-          collection(db, "diagnostics"),
-          where("userId", "==", user.uid)
-        );
-        const querySnapshot = await getDocs(q);
-        const firestoreList: Diagnosis[] = [];
-        querySnapshot.forEach((doc) => {
-          firestoreList.push(doc.data() as Diagnosis);
-        });
-        
-        if (firestoreList.length > 0) {
-          // Sort descending by timestamp
-          firestoreList.sort((a, b) => b.timestamp - a.timestamp);
-          setDiagnosisHistory(firestoreList);
-          localStorage.setItem('diagnosis_history', JSON.stringify(firestoreList));
-        }
-      } catch (err) {
-        console.error("Could not fetch remote diagnostics history:", err);
-      }
-    };
-
-    loadFirestoreDiagnostics();
-  }, [user]);
-
-  const handleDiagnosisComplete = async (diagnosis: Diagnosis) => {
+  const handleDiagnosisComplete = (diagnosis: Diagnosis) => {
     setShowCamera(false);
     setCurrentDiagnosis(diagnosis);
     const updatedHistory = [diagnosis, ...diagnosisHistory];
     setDiagnosisHistory(updatedHistory);
     localStorage.setItem('diagnosis_history', JSON.stringify(updatedHistory));
-
-    // Save to Firestore if real session is active
-    if (user && !user.uid.startsWith("offline_user_")) {
-      try {
-        const { doc, setDoc } = await import("firebase/firestore");
-        const { db } = await import("./lib/firebase");
-        const diagnosisDocRef = doc(db, "diagnostics", diagnosis.id);
-        const payload = {
-          ...diagnosis,
-          userId: user.uid,
-        };
-        await setDoc(diagnosisDocRef, payload);
-        console.log("Diagnosis synchronized with Firestore.");
-      } catch (err) {
-        console.error("Failed to sync diagnosis to Firestore:", err);
-      }
-    }
   };
 
   const renderContent = () => {
@@ -256,9 +205,25 @@ export default function App() {
                 {profile?.role === "Admin" ? "System Administrator" : profile?.role === "Expert" ? "Expert Consultant" : "Community Farmer Member"}
               </p>
               
-              {user && (
-                <div className="mt-4 flex flex-col items-center">
+              {user ? (
+                <div className="mt-6 flex flex-col items-center gap-3">
                   <span className="text-xs font-semibold text-slate-400">{user.email}</span>
+                  <button 
+                    onClick={logout}
+                    className="bg-red-50 hover:bg-red-155 text-red-750 px-5 py-2.5 rounded-2xl font-black uppercase text-[10px] tracking-wider transition-all cursor-pointer"
+                  >
+                    {t('signOut')}
+                  </button>
+                </div>
+              ) : (
+                <div className="mt-6 flex flex-col items-center gap-4">
+                  <p className="text-xs text-slate-450 font-semibold">{t('notSignedIn')}</p>
+                  <button 
+                    onClick={login}
+                    className="bg-[#1B4332] hover:bg-emerald-800 text-white px-5 py-3 rounded-2xl font-black uppercase text-[10px] tracking-wider transition-all shadow cursor-pointer"
+                  >
+                    {t('signInWithGoogle')}
+                  </button>
                 </div>
               )}
             </div>

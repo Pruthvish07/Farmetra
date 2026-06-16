@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Heart, Star, Send, Loader2, MessageSquare, AlertCircle } from "lucide-react";
-import { collection, query, orderBy, onSnapshot, doc, setDoc, updateDoc, deleteDoc } from "firebase/firestore";
+import { collection, query, orderBy, onSnapshot, doc, addDoc, updateDoc, deleteDoc } from "firebase/firestore";
 import { db, handleFirestoreError, OperationType } from "../../lib/firebase";
 import { useAuth } from "../../lib/AuthContext";
 import { useLanguage } from "../../lib/LanguageContext";
@@ -18,7 +18,7 @@ export interface FeedbackItem {
 }
 
 export default function CommunityFeedback() {
-  const { user, profile, loginWithUsername } = useAuth();
+  const { user, profile, login } = useAuth();
   const { t } = useLanguage();
   const [feedbacks, setFeedbacks] = useState<FeedbackItem[]>([]);
   const [newText, setNewText] = useState("");
@@ -79,9 +79,7 @@ export default function CommunityFeedback() {
     const path = "feedbacks";
 
     try {
-      const docRef = doc(collection(db, "feedbacks"));
       const payload = {
-        id: docRef.id,
         userId: user.uid,
         userName: user.displayName || user.email?.split("@")[0] || "Farmer Participant",
         userEmail: user.email || "",
@@ -91,7 +89,7 @@ export default function CommunityFeedback() {
         adminLikes: [],
       };
 
-      await setDoc(docRef, payload);
+      await addDoc(collection(db, "feedbacks"), payload);
       setNewText("");
     } catch (err) {
       console.error("Error creating feedback doc:", err);
@@ -183,40 +181,16 @@ export default function CommunityFeedback() {
 
       {/* Auth Gate and Submission form */}
       {!user ? (
-        <div className="p-8 bg-emerald-500/5 rounded-3xl border border-emerald-500/15 space-y-4 text-center max-w-sm mx-auto">
-          <p className="text-xs text-slate-500 dark:text-slate-400 font-extrabold uppercase tracking-wider">
+        <div className="p-8 text-center bg-emerald-500/5 rounded-3xl border border-emerald-500/15 space-y-4">
+          <p className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">
             {t("notSignedIn")}
           </p>
-          <p className="text-[10px] text-[#2B3A32] dark:text-[#8E9299] font-bold uppercase tracking-wider">
-            Type your username to post feedback:
-          </p>
-          <div className="flex gap-2 max-w-xs mx-auto">
-            <input
-              type="text"
-              id="feedback-username-input"
-              placeholder="e.g. Ramesh Patil"
-              className="flex-1 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-xs font-bold p-3 rounded-xl outline-none focus:border-emerald-500/40 text-left text-slate-800 dark:text-white"
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  const val = (e.currentTarget as HTMLInputElement).value;
-                  if (val.trim()) {
-                    loginWithUsername(val.trim(), 'en', 'Farmer');
-                  }
-                }
-              }}
-            />
-            <button
-              onClick={() => {
-                const inputEl = document.getElementById('feedback-username-input') as HTMLInputElement;
-                if (inputEl && inputEl.value.trim()) {
-                  loginWithUsername(inputEl.value.trim(), 'en', 'Farmer');
-                }
-              }}
-              className="px-4 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-black uppercase text-[10px] tracking-wider rounded-xl transition-all shadow-md cursor-pointer"
-            >
-              Log In
-            </button>
-          </div>
+          <button
+            onClick={login}
+            className="px-6 py-3 bg-[#1B4332] hover:bg-[#123023] text-white font-black uppercase text-xs tracking-wider rounded-2xl transition-all shadow-md inline-flex items-center gap-2"
+          >
+            {t("signInWithGoogle")}
+          </button>
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="bg-white dark:bg-[#111814] rounded-3xl p-4 border border-[#E5E5E5] dark:border-white/5 shadow-sm space-y-3">
