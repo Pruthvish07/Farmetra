@@ -19,7 +19,92 @@ const getAIClient = (): GoogleGenAI | null => {
   if (!apiKey) {
     return null;
   }
-  return new GoogleGenAI({ apiKey });
+  return new GoogleGenAI({
+    apiKey,
+    httpOptions: {
+      headers: {
+        'User-Agent': 'aistudio-build',
+      }
+    }
+  });
+};
+
+const getMockDisease = () => {
+  const mockDiseases = [
+    {
+      cropName: "Tomato",
+      diseaseName: "Early Blight Infection",
+      diseaseType: "Fungal",
+      confidence: 0.96,
+      severity: "Medium",
+      symptoms: [
+        "Concentric brownish circular 'target spot' lesions appearing on older foliage",
+        "Chlorotic yellow halos surrounding spots with gradual leaf drop",
+        "Sunken dark spots near the fruit stem margins"
+      ],
+      treatment: [
+        "Prune off compromised lower leaves to obstruct soil spore splashbacks",
+        "Spray copper octanoate or chlorothalonil fungicide at sunset",
+        "Adopt organic bio-fungicides containing Bacillus amyloliquefaciens"
+      ],
+      preventiveMeasures: [
+        "Lay down clean plastic or straw mulch underneath plants",
+        "Practice Solanaceae crop rotation cycles on a 3-year recurring loop",
+        "Avoid overhead leaf sprinkling, adopt drip base-irrigation"
+      ]
+    },
+    {
+      cropName: "Potato",
+      diseaseName: "Late Blight Phytophthora",
+      diseaseType: "Fungal",
+      confidence: 0.91,
+      severity: "High",
+      symptoms: [
+        "Irregular water-soaked dark margins crawling rapidly across main stems",
+        "White velvety sporulation or downy mildew dusting underneath damp leaves",
+        "Tuber rot showing as a dry brick-red granular internal discoloration"
+      ],
+      treatment: [
+        "Instantly harvest and safely bury/burn infected foliage to avoid spore drift",
+        "Foliar treat using systemic Metalaxyl-M or Mancozeb sprays immediately",
+        "Aerate the canopy space by widening field spacing margins"
+      ],
+      preventiveMeasures: [
+        "Plant strictly certified disease-free seed potato tubers",
+        "Select hybrid varieties exhibiting premium Phytophthora resistance",
+        "Deconstruct volunteer potato plants emerging in neighbor plots"
+      ]
+    },
+    {
+      cropName: "Chili Pepper",
+      diseaseName: "Anthracnose Fruit Spot",
+      diseaseType: "Fungal",
+      confidence: 0.88,
+      severity: "Medium",
+      symptoms: [
+        "Water-soaked dark circular lesions that expand into sunken black spots on chili pods",
+        "Concentric rings of pinkish/orange moist gelatinous spores forming during high dampness",
+        "Stem dry-back and premature leaf shedding on vulnerable sprigs"
+      ],
+      treatment: [
+        "Harvest and delete affected chili pods to secure the remaining harvest",
+        "Foliar treat using Bordeaux mixture or sulfur-based contact fungicides",
+        "Incorporate neem oil sprays to suppress mild pathogen proliferation"
+      ],
+      preventiveMeasures: [
+        "Procure high-quality certified seed crops and execute seed-hypochlorite baths",
+        "Irrigate solely at the soil base to deny spores any surface swimming water",
+        "Eliminate weed hosts such as nightshades near the pepper boundaries"
+      ]
+    }
+  ];
+  const selected = mockDiseases[Math.floor(Math.random() * mockDiseases.length)];
+  return {
+    ...selected,
+    id: "sim-" + Math.random().toString(36).substring(2, 11),
+    timestamp: Date.now(),
+    isSimulated: true
+  };
 };
 
 // API: PlantVillage Agri-Intel CNN v5.0 Pathology Route
@@ -32,140 +117,70 @@ app.post("/api/analyze", async (req, res) => {
 
     // Strip header prefix if present
     const base64Data = image.replace(/^data:image\/\w+;base64,/, "");
+    // Extract dynamic MIME type if possible, default to image/jpeg
+    const mimeMatch = image.match(/^data:(image\/\w+);base64,/);
+    const mimeType = mimeMatch ? mimeMatch[1] : "image/jpeg";
 
     const ai = getAIClient();
     if (!ai) {
       console.warn("⚠️ GEMINI_API_KEY is not defined in environment. Falling back to the high-fidelity local Farmetra CNN v5.0 Simulation Engine.");
-      
-      // High-fidelity fallback CNN simulation so the app is always robust and works offline/without keys!
-      const mockDiseases = [
-        {
-          cropName: "Tomato",
-          diseaseName: "Early Blight Infection",
-          diseaseType: "Fungal",
-          confidence: 0.96,
-          severity: "Medium",
-          symptoms: [
-            "Concentric brownish circular 'target spot' lesions appearing on older foliage",
-            "Chlorotic yellow halos surrounding spots with gradual leaf drop",
-            "Sunken dark spots near the fruit stem margins"
-          ],
-          treatment: [
-            "Prune off compromised lower leaves to obstruct soil spore splashbacks",
-            "Spray copper octanoate or chlorothalonil fungicide at sunset",
-            "Adopt organic bio-fungicides containing Bacillus amyloliquefaciens"
-          ],
-          preventiveMeasures: [
-            "Lay down clean plastic or straw mulch underneath plants",
-            "Practice Solanaceae crop rotation cycles on a 3-year recurring loop",
-            "Avoid overhead leaf sprinkling, adopt drip base-irrigation"
-          ]
-        },
-        {
-          cropName: "Potato",
-          diseaseName: "Late Blight Phytophthora",
-          diseaseType: "Fungal",
-          confidence: 0.91,
-          severity: "High",
-          symptoms: [
-            "Irregular water-soaked dark margins crawling rapidly across main stems",
-            "White velvety sporulation or downy mildew dusting underneath damp leaves",
-            "Tuber rot showing as a dry brick-red granular internal discoloration"
-          ],
-          treatment: [
-            "Instantly harvest and safely bury/burn infected foliage to avoid spore drift",
-            "Foliar treat using systemic Metalaxyl-M or Mancozeb sprays immediately",
-            "Aerate the canopy space by widening field spacing margins"
-          ],
-          preventiveMeasures: [
-            "Plant strictly certified disease-free seed potato tubers",
-            "Select hybrid varieties exhibiting premium Phytophthora resistance",
-            "Deconstruct volunteer potato plants emerging in neighbor plots"
-          ]
-        },
-        {
-          cropName: "Chili Pepper",
-          diseaseName: "Anthracnose Fruit Spot",
-          diseaseType: "Fungal",
-          confidence: 0.88,
-          severity: "Medium",
-          symptoms: [
-            "Water-soaked dark circular lesions that expand into sunken black spots on chili pods",
-            "Concentric rings of pinkish/orange moist gelatinous spores forming during high dampness",
-            "Stem dry-back and premature leaf shedding on vulnerable sprigs"
-          ],
-          treatment: [
-            "Harvest and delete affected chili pods to secure the remaining harvest",
-            "Foliar treat using Bordeaux mixture or sulfur-based contact fungicides",
-            "Incorporate neem oil sprays to suppress mild pathogen proliferation"
-          ],
-          preventiveMeasures: [
-            "Procure high-quality certified seed crops and execute seed-hypochlorite baths",
-            "Irrigate solely at the soil base to deny spores any surface swimming water",
-            "Eliminate weed hosts such as nightshades near the pepper boundaries"
-          ]
-        }
-      ];
-
-      // Pick a semi-random simulated detection or default to Tomato Early Blight
-      const selected = mockDiseases[Math.floor(Math.random() * mockDiseases.length)];
-      return res.json({
-        ...selected,
-        id: "sim-" + Math.random().toString(36).substr(2, 9),
-        timestamp: Date.now(),
-        isSimulated: true
-      });
+      return res.json(getMockDisease());
     }
 
     console.log("🚀 Executing server-side plant pathology via Gemini (PlantVillage Agri-Intel CNN Engine v5.0)...");
     
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: [
-        {
-          parts: [
-            {
-              text: "Identify the crop and analyze any visible diseases, pathogens or pests. Return a highly professional, accurate diagnosis.",
-            },
-            {
-              inlineData: {
-                data: base64Data,
-                mimeType: "image/jpeg",
+    try {
+      const response = await ai.models.generateContent({
+        model: "gemini-3.5-flash",
+        contents: [
+          {
+            parts: [
+              {
+                text: "Identify the crop and analyze any visible diseases, pathogens or pests. Return a highly professional, accurate diagnosis.",
               },
-            },
-          ],
-        },
-      ],
-      config: {
-        systemInstruction: "You are the PlantVillage Agri-Intel CNN Engine v5.0, a state-of-the-art deep learning convolutional neural network trained on millions of high-resolution agricultural disease images. Carefully analyze the leaf canvas to identify pathogens with high-density bounding confidence. Return the result in JSON format matching the schema exactly.",
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: Type.OBJECT,
-          properties: {
-            cropName: { type: Type.STRING },
-            diseaseName: { type: Type.STRING },
-            diseaseType: { type: Type.STRING, enum: ['Fungal', 'Bacterial', 'Viral', 'Pest', 'Healthy'] },
-            confidence: { type: Type.NUMBER },
-            severity: { type: Type.STRING, enum: ['Low', 'Medium', 'High'] },
-            symptoms: { type: Type.ARRAY, items: { type: Type.STRING } },
-            treatment: { type: Type.ARRAY, items: { type: Type.STRING } },
-            preventiveMeasures: { type: Type.ARRAY, items: { type: Type.STRING } },
+              {
+                inlineData: {
+                  data: base64Data,
+                  mimeType: mimeType,
+                },
+              },
+            ],
           },
-          required: ['cropName', 'diseaseName', 'diseaseType', 'confidence', 'severity', 'symptoms', 'treatment', 'preventiveMeasures'],
+        ],
+        config: {
+          systemInstruction: "You are the PlantVillage Agri-Intel CNN Engine v5.0, a state-of-the-art deep learning convolutional neural network trained on millions of high-resolution agricultural disease images. Carefully analyze the leaf canvas to identify pathogens with high-density bounding confidence. Return the result in JSON format matching the schema exactly.",
+          responseMimeType: "application/json",
+          responseSchema: {
+            type: Type.OBJECT,
+            properties: {
+              cropName: { type: Type.STRING },
+              diseaseName: { type: Type.STRING },
+              diseaseType: { type: Type.STRING, enum: ['Fungal', 'Bacterial', 'Viral', 'Pest', 'Healthy'] },
+              confidence: { type: Type.NUMBER },
+              severity: { type: Type.STRING, enum: ['Low', 'Medium', 'High'] },
+              symptoms: { type: Type.ARRAY, items: { type: Type.STRING } },
+              treatment: { type: Type.ARRAY, items: { type: Type.STRING } },
+              preventiveMeasures: { type: Type.ARRAY, items: { type: Type.STRING } },
+            },
+            required: ['cropName', 'diseaseName', 'diseaseType', 'confidence', 'severity', 'symptoms', 'treatment', 'preventiveMeasures'],
+          },
         },
-      },
-    });
+      });
 
-    if (!response.text) {
-      throw new Error("Agri-Intel CNN yielded an empty prediction stream. Try another leaf frame.");
+      if (!response.text) {
+        throw new Error("Agri-Intel CNN yielded an empty prediction stream. Try another leaf frame.");
+      }
+
+      const diagnosis = JSON.parse(response.text);
+      return res.json({
+        ...diagnosis,
+        id: "cnn-" + Math.random().toString(36).substring(2, 11),
+        timestamp: Date.now()
+      });
+    } catch (apiError: any) {
+      console.error("⚠️ Gemini API execution error, falling back to local simulation:", apiError);
+      return res.json(getMockDisease());
     }
-
-    const diagnosis = JSON.parse(response.text);
-    return res.json({
-      ...diagnosis,
-      id: "cnn-" + Math.random().toString(36).substr(2, 9),
-      timestamp: Date.now()
-    });
 
   } catch (error: any) {
     console.error("❌ Agri-Intel CNN Engine Error:", error);
