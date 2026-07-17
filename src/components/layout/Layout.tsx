@@ -1,6 +1,6 @@
 import { motion } from 'motion/react';
-import { Home, Camera, History, User, Settings, Book, Sun, Moon, MessageSquare, Download } from 'lucide-react';
-import { ReactNode, useState, useEffect } from 'react';
+import { Home, Camera, History, User, Settings, Book, Sun, Moon, MessageSquare } from 'lucide-react';
+import { ReactNode } from 'react';
 import { USER_NAME } from '../../constants';
 import { cn } from '../../lib/utils';
 import logoImg from '../../assets/images/farmetra_logo_1780246757391.png';
@@ -16,66 +16,6 @@ interface LayoutProps {
 
 export default function Layout({ children, activeTab, onTabChange, isDarkMode, onToggleTheme }: LayoutProps) {
   const { t } = useLanguage();
-
-  // PWA installation state management
-  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
-  const [showInstallBtn, setShowInstallBtn] = useState<boolean>(false);
-
-  useEffect(() => {
-    // Detect if app is already running in installed standalone mode
-    const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
-    if (!isStandalone) {
-      // Always show button in standard web browser access to maximize conversion
-      setShowInstallBtn(true);
-    }
-
-    const handleBeforeInstallPrompt = (e: any) => {
-      // Prevent browser default installation prompt
-      e.preventDefault();
-      // Store the event for user-triggered launch
-      setDeferredPrompt(e);
-      setShowInstallBtn(true);
-    };
-
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-
-    const handleAppInstalled = () => {
-      console.log('Farmetra has been successfully installed on this device.');
-      setShowInstallBtn(false);
-      setDeferredPrompt(null);
-    };
-
-    window.addEventListener('appinstalled', handleAppInstalled);
-
-    return () => {
-      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-      window.removeEventListener('appinstalled', handleAppInstalled);
-    };
-  }, []);
-
-  const handleInstallClick = async () => {
-    if (!deferredPrompt) {
-      // Fallback instructions for browsers that don't support beforeinstallprompt natively (e.g. iOS Safari)
-      alert(
-        "To install Farmetra on your device:\n\n" +
-        "• On iOS (Safari): Tap the Share button in the browser menu and select 'Add to Home Screen'.\n" +
-        "• On Android (Chrome): Tap the menu icon (⋮) and select 'Install app' or 'Add to Home screen'.\n" +
-        "• On Desktop (Chrome/Edge): Click the install icon in the address bar."
-      );
-      return;
-    }
-
-    try {
-      deferredPrompt.prompt();
-      const { outcome } = await deferredPrompt.userChoice;
-      console.log(`PWA Installation Prompt Choice: ${outcome}`);
-    } catch (err) {
-      console.error("Installation failed:", err);
-    } finally {
-      setDeferredPrompt(null);
-      setShowInstallBtn(false);
-    }
-  };
 
   // Mobile/Desktop navigation paths matching Mockup 2
   const sidebarTabs = [
@@ -234,28 +174,8 @@ export default function Layout({ children, activeTab, onTabChange, isDarkMode, o
             />
           </div>
 
-          {/* Secure Online Sync status indicator & PWA Install Button */}
+          {/* Secure Online Sync status indicator */}
           <div className="flex items-center gap-3">
-            {showInstallBtn && (
-              <motion.button
-                id="pwa-install-button"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={handleInstallClick}
-                className={cn(
-                  "flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-wider border transition-all",
-                  isDarkMode
-                    ? "bg-[#1B4332] text-emerald-300 border-emerald-500/40 hover:bg-emerald-900/40 shadow-md shadow-emerald-950/30"
-                    : "bg-[#1B4332] text-white border-transparent hover:bg-[#2d6a4f] shadow-md shadow-emerald-800/10"
-                )}
-              >
-                <Download size={11} className="animate-bounce" />
-                <span>Install App</span>
-              </motion.button>
-            )}
-
             <span className={cn(
               "flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-[9px] font-black border uppercase tracking-wider",
               isDarkMode 

@@ -4,31 +4,30 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Farmetra Agri-Intelligence</title>
-    
-    <!-- PWA Link & Branding Meta Tags -->
-    <link rel="manifest" href="/manifest.json" />
-    <meta name="theme-color" content="#1B4332" />
-    <meta name="mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="Farmetra" />
-    <link rel="apple-touch-icon" href="/icon-192.png" />
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
-    
-    <!-- Service Worker Registration Script -->
     <script>
+      // Automatically unregister service workers and clear cache storage to fix white screen issues
       if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/service-worker.js')
-            .then((registration) => {
-              console.log('[Service Worker] Registration successful with scope: ', registration.scope);
-            })
-            .catch((err) => {
-              console.error('[Service Worker] Registration failed: ', err);
+        navigator.serviceWorker.getRegistrations().then((registrations) => {
+          for (let registration of registrations) {
+            registration.unregister().then((success) => {
+              if (success) {
+                console.log('[PWA Cleanup] Unregistered service worker');
+              }
             });
+          }
+        });
+      }
+      if ('caches' in window) {
+        caches.keys().then((keys) => {
+          keys.forEach((key) => {
+            caches.delete(key).then(() => {
+              console.log('[PWA Cleanup] Deleted cache:', key);
+            });
+          });
         });
       }
     </script>
