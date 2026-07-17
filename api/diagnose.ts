@@ -81,75 +81,116 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       },
     });
 
-    // 4. Send analysis query to the active Gemini Flash model
-    const aiResponse = await ai.models.generateContent({
-      model: "gemini-3.5-flash",
-      contents: [
-        {
-          parts: [
+    // 4. Send analysis query to the active Gemini Flash model with exponential backoff & lighter model fallback
+    const maxRetries = 3;
+    const initialDelay = 1500;
+    let attempt = 0;
+    let currentModel = "gemini-3.5-flash";
+    let aiResponse: any = null;
+
+    while (true) {
+      try {
+        console.log(`[Gemini Serverless] Querying model: ${currentModel} (Attempt ${attempt + 1}/${maxRetries + 1})`);
+        aiResponse = await ai.models.generateContent({
+          model: currentModel,
+          contents: [
             {
-              text: "Identify the crop and analyze any visible diseases or pests. Provide symptoms, organic treatments, and preventive measures.",
-            },
-            {
-              inlineData: {
-                data: base64Data,
-                mimeType: mimeType,
-              },
+              parts: [
+                {
+                  text: "Identify the crop and analyze any visible diseases or pests. Provide symptoms, organic treatments, and preventive measures.",
+                },
+                {
+                  inlineData: {
+                    data: base64Data,
+                    mimeType: mimeType,
+                  },
+                },
+              ],
             },
           ],
-        },
-      ],
-      config: {
-        systemInstruction:
-          "You are a professional plant pathologist. Carefully examine the visual agriculture evidence to diagnose plant diseases, pathogens, and nutrient deficiencies. If the image is unclear or not a plant, explain what you see and guide the user on what details to capture next. Always return the analysis in JSON format conforming to the exact schema properties.",
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: Type.OBJECT,
-          properties: {
-            cropName: { type: Type.STRING, description: "The name of the crop or plant identified" },
-            diseaseName: { type: Type.STRING, description: "Specific name of the disease or Pest, or 'Healthy'" },
-            diseaseType: {
-              type: Type.STRING,
-              enum: ["Fungal", "Bacterial", "Viral", "Pest", "Healthy"],
-              description: "Category of the threat",
-            },
-            confidence: { type: Type.NUMBER, description: "Confidence score from 0.0 to 1.0" },
-            severity: {
-              type: Type.STRING,
-              enum: ["Low", "Medium", "High"],
-              description: "Urgency/Severity level",
-            },
-            symptoms: {
-              type: Type.ARRAY,
-              items: { type: Type.STRING },
-              description: "Detailed observable visual symptoms on leaves/stems",
-            },
-            treatment: {
-              type: Type.ARRAY,
-              items: { type: Type.STRING },
-              description: "Organic remedies and immediate non-chemical treatments",
-            },
-            preventiveMeasures: {
-              type: Type.ARRAY,
-              items: { type: Type.STRING },
-              description: "Preventative procedures for future protection",
+          config: {
+            systemInstruction:
+              "You are a professional plant pathologist. Carefully examine the visual agriculture evidence to diagnose plant diseases, pathogens, and nutrient deficiencies. If the image is unclear or not a plant, explain what you see and guide the user on what details to capture next. Always return the analysis in JSON format conforming to the exact schema properties.",
+            responseMimeType: "application/json",
+            responseSchema: {
+              type: Type.OBJECT,
+              properties: {
+                cropName: { type: Type.STRING, description: "The name of the crop or plant identified" },
+                diseaseName: { type: Type.STRING, description: "Specific name of the disease or Pest, or 'Healthy'" },
+                diseaseType: {
+                  type: Type.STRING,
+                  enum: ["Fungal", "Bacterial", "Viral", "Pest", "Healthy"],
+                  description: "Category of the threat",
+                },
+                confidence: { type: Type.NUMBER, description: "Confidence score from 0.0 to 1.0" },
+                severity: {
+                  type: Type.STRING,
+                  enum: ["Low", "Medium", "High"],
+                  description: "Urgency/Severity level",
+                },
+                symptoms: {
+                  type: Type.ARRAY,
+                  items: { type: Type.STRING },
+                  description: "Detailed observable visual symptoms on leaves/stems",
+                },
+                treatment: {
+                  type: Type.ARRAY,
+                  items: { type: Type.STRING },
+                  description: "Organic remedies and immediate non-chemical treatments",
+                },
+                preventiveMeasures: {
+                  type: Type.ARRAY,
+                  items: { type: Type.STRING },
+                  description: "Preventative procedures for future protection",
+                },
+              },
+              required: [
+                "cropName",
+                "diseaseName",
+                "diseaseType",
+                "confidence",
+                "severity",
+                "symptoms",
+                "treatment",
+                "preventiveMeasures",
+              ],
             },
           },
-          required: [
-            "cropName",
-            "diseaseName",
-            "diseaseType",
-            "confidence",
-            "severity",
-            "symptoms",
-            "treatment",
-            "preventiveMeasures",
-          ],
-        },
-      },
-    });
+        });
+        break; // Success, break retry loop
+      } catch (error: any) {
+        console.error(`[Gemini Serverless] Error on ${currentModel}:`, error);
 
-    if (!aiResponse.text) {
+        const errorMessage = error.message || "";
+        const isOverloaded =
+          error.status === 503 ||
+          error.status === 429 ||
+          errorMessage.includes("503") ||
+          errorMessage.includes("429") ||
+          errorMessage.toLowerCase().includes("busy") ||
+          errorMessage.toLowerCase().includes("overloaded") ||
+          errorMessage.toLowerCase().includes("high demand") ||
+          errorMessage.toLowerCase().includes("resource_exhausted") ||
+          errorMessage.toLowerCase().includes("exhausted");
+
+        if (isOverloaded && attempt < maxRetries) {
+          attempt++;
+          // Fall back to lighter model
+          if (currentModel === "gemini-3.5-flash" && attempt >= 1) {
+            console.warn(`[Gemini Serverless] Primary model overloaded. Falling back to lighter model: gemini-3.1-flash-lite`);
+            currentModel = "gemini-3.1-flash-lite";
+          }
+          const backoffTime = initialDelay * Math.pow(2, attempt - 1);
+          console.warn(`[Gemini Serverless] Overload detected. Retrying in ${backoffTime}ms...`);
+          await new Promise((resolve) => setTimeout(resolve, backoffTime));
+          continue;
+        }
+
+        throw error;
+      }
+    }
+
+    if (!aiResponse || !aiResponse.text) {
       throw new Error("No response string received from Google Gemini Pathologist Engine.");
     }
 
@@ -166,8 +207,27 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(200).json(finalizedDiagnosis);
   } catch (error: any) {
     console.error("Vercel Serverless Function Error:", error);
+
+    const errorMessage = error.message || "";
+    const isOverloaded =
+      error.status === 503 ||
+      error.status === 429 ||
+      errorMessage.includes("503") ||
+      errorMessage.includes("429") ||
+      errorMessage.toLowerCase().includes("busy") ||
+      errorMessage.toLowerCase().includes("overloaded") ||
+      errorMessage.toLowerCase().includes("high demand") ||
+      errorMessage.toLowerCase().includes("resource_exhausted") ||
+      errorMessage.toLowerCase().includes("exhausted");
+
+    if (isOverloaded) {
+      return res.status(503).json({
+        error: "The AI server is busy right now. Please wait a moment and try again.",
+      });
+    }
+
     return res.status(500).json({
-      error: error.message || "An unexpected error occurred in the Gemini CNN serverless function.",
+      error: errorMessage || "An unexpected error occurred in the Gemini CNN serverless function.",
     });
   }
 }
