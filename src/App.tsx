@@ -205,27 +205,9 @@ export default function App() {
                 {profile?.role === "Admin" ? "System Administrator" : profile?.role === "Expert" ? "Expert Consultant" : "Community Farmer Member"}
               </p>
               
-              {user ? (
-                <div className="mt-6 flex flex-col items-center gap-3">
-                  <span className="text-xs font-semibold text-slate-400">{user.email}</span>
-                  <button 
-                    onClick={logout}
-                    className="bg-red-50 hover:bg-red-155 text-red-750 px-5 py-2.5 rounded-2xl font-black uppercase text-[10px] tracking-wider transition-all cursor-pointer"
-                  >
-                    {t('signOut')}
-                  </button>
-                </div>
-              ) : (
-                <div className="mt-6 flex flex-col items-center gap-4">
-                  <p className="text-xs text-slate-450 font-semibold">{t('notSignedIn')}</p>
-                  <button 
-                    onClick={login}
-                    className="bg-[#1B4332] hover:bg-emerald-800 text-white px-5 py-3 rounded-2xl font-black uppercase text-[10px] tracking-wider transition-all shadow cursor-pointer"
-                  >
-                    {t('signInWithGoogle')}
-                  </button>
-                </div>
-              )}
+              <div className="mt-6 flex flex-col items-center gap-3">
+                <span className="text-xs font-semibold text-slate-400">{user?.email || "pruthvishbshetty45@gmail.com"}</span>
+              </div>
             </div>
 
             <div className="space-y-4">

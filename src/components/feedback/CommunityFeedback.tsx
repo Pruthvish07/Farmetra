@@ -179,47 +179,33 @@ export default function CommunityFeedback() {
         </div>
       )}
 
-      {/* Auth Gate and Submission form */}
-      {!user ? (
-        <div className="p-8 text-center bg-emerald-500/5 rounded-3xl border border-emerald-500/15 space-y-4">
-          <p className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">
-            {t("notSignedIn")}
-          </p>
+      {/* Submission form */}
+      <form onSubmit={handleSubmit} className="bg-white dark:bg-[#111814] rounded-3xl p-4 border border-[#E5E5E5] dark:border-white/5 shadow-sm space-y-3">
+        <textarea
+          value={newText}
+          onChange={(e) => setNewText(e.target.value)}
+          placeholder={t("writeFeedbackPlaceholder")}
+          maxLength={1000}
+          className="w-full text-xs font-semibold p-4 rounded-2xl border border-slate-100 dark:border-emerald-900/10 bg-slate-50/50 dark:bg-white/[0.02] outline-none focus:border-emerald-500/40 text-left min-h-[90px] text-slate-700 dark:text-white resize-none"
+        />
+        <div className="flex justify-between items-center bg-slate-50/30 dark:bg-white/[0.01] p-1 rounded-2xl">
+          <span className="text-[10px] font-mono text-slate-400 font-bold px-3">
+            {newText.length}/1000 CHARS
+          </span>
           <button
-            onClick={login}
-            className="px-6 py-3 bg-[#1B4332] hover:bg-[#123023] text-white font-black uppercase text-xs tracking-wider rounded-2xl transition-all shadow-md inline-flex items-center gap-2"
+            type="submit"
+            disabled={submitting || !newText.trim()}
+            className="bg-[#1B4332] text-white hover:bg-emerald-800 disabled:bg-slate-200 dark:disabled:bg-white/5 disabled:text-slate-400 px-5 py-2.5 rounded-xl font-black uppercase text-[10px] tracking-wider transition-all flex items-center gap-2 cursor-pointer shadow"
           >
-            {t("signInWithGoogle")}
+            {submitting ? (
+              <Loader2 size={12} className="animate-spin" />
+            ) : (
+              <Send size={12} />
+            )}
+            {t("submit")}
           </button>
         </div>
-      ) : (
-        <form onSubmit={handleSubmit} className="bg-white dark:bg-[#111814] rounded-3xl p-4 border border-[#E5E5E5] dark:border-white/5 shadow-sm space-y-3">
-          <textarea
-            value={newText}
-            onChange={(e) => setNewText(e.target.value)}
-            placeholder={t("writeFeedbackPlaceholder")}
-            maxLength={1000}
-            className="w-full text-xs font-semibold p-4 rounded-2xl border border-slate-100 dark:border-emerald-900/10 bg-slate-50/50 dark:bg-white/[0.02] outline-none focus:border-emerald-500/40 text-left min-h-[90px] text-slate-700 dark:text-white resize-none"
-          />
-          <div className="flex justify-between items-center bg-slate-50/30 dark:bg-white/[0.01] p-1 rounded-2xl">
-            <span className="text-[10px] font-mono text-slate-400 font-bold px-3">
-              {newText.length}/1000 CHARS
-            </span>
-            <button
-              type="submit"
-              disabled={submitting || !newText.trim()}
-              className="bg-[#1B4332] text-white hover:bg-emerald-800 disabled:bg-slate-200 dark:disabled:bg-white/5 disabled:text-slate-400 px-5 py-2.5 rounded-xl font-black uppercase text-[10px] tracking-wider transition-all flex items-center gap-2 cursor-pointer shadow"
-            >
-              {submitting ? (
-                <Loader2 size={12} className="animate-spin" />
-              ) : (
-                <Send size={12} />
-              )}
-              {t("submit")}
-            </button>
-          </div>
-        </form>
-      )}
+      </form>
 
       {/* Feedbacks list */}
       <div className="space-y-4">

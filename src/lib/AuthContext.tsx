@@ -15,16 +15,43 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const mockUser = {
+  uid: "mock-user-123",
+  displayName: "Pruthvish B Shetty",
+  email: "pruthvishbshetty45@gmail.com",
+  photoURL: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=150",
+  emailVerified: true,
+  isAnonymous: false,
+  metadata: {},
+  providerData: [],
+  phoneNumber: null,
+  tenantId: null,
+  providerId: "google.com",
+  delete: async () => {},
+  getIdToken: async () => "mock-token",
+  getIdTokenResult: async () => ({} as any),
+  reload: async () => {},
+  toJSON: () => ({}),
+} as unknown as User;
+
+const mockProfile: UserProfile = {
+  uid: "mock-user-123",
+  displayName: "Pruthvish B Shetty",
+  email: "pruthvishbshetty45@gmail.com",
+  role: "Admin",
+  language: "en",
+};
+
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<User | null>(mockUser);
+  const [profile, setProfile] = useState<UserProfile | null>(mockProfile);
+  const [loading, setLoading] = useState(false);
 
   // Synchronizes auth state and user profile
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      setUser(firebaseUser);
       if (firebaseUser) {
+        setUser(firebaseUser);
         setLoading(true);
         const path = `users/${firebaseUser.uid}`;
         try {
@@ -59,7 +86,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setLoading(false);
         }
       } else {
-        setProfile(null);
+        setUser(mockUser);
+        setProfile(mockProfile);
         setLoading(false);
       }
     });
