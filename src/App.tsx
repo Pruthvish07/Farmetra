@@ -12,6 +12,7 @@ import { USER_NAME } from './constants';
 import { cn } from './lib/utils';
 import { useAuth } from './lib/AuthContext';
 import { useLanguage } from './lib/LanguageContext';
+import adminAvatarImg from './assets/images/admin_avatar_1784708968111.jpg';
 
 // Seed sample diagnosis histories to prevent empty states on first run, matching mockup details!
 const sampleDetections: Diagnosis[] = [
@@ -192,11 +193,7 @@ export default function App() {
           <div className="p-6 md:p-12 max-w-2xl mx-auto space-y-8 pb-24 relative z-10 transition-colors text-left">
             <div className="bg-white dark:bg-white/5 rounded-[32px] p-8 shadow-sm border border-emerald-50 dark:border-white/10 flex flex-col items-center text-center">
               <div className="w-24 h-24 rounded-full bg-[#1B4332] flex items-center justify-center text-white text-3xl font-black mb-6 ring-8 ring-emerald-50 dark:ring-emerald-900/20 shadow-xl overflow-hidden">
-                {user?.photoURL ? (
-                  <img src={user.photoURL} alt="Profile" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
-                ) : (
-                  initials
-                )}
+                <img src={user?.photoURL || adminAvatarImg} alt="Profile" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
               </div>
               <h2 className="text-2xl font-black text-[#1B4332] dark:text-white tracking-tighter uppercase">
                 {user ? (user.displayName || "Farmer Participant") : USER_NAME}

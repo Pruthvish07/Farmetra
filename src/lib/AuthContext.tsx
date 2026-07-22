@@ -3,6 +3,7 @@ import { User, signInWithPopup, signOut as firebaseSignOut, onAuthStateChanged }
 import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { auth, db, googleProvider, handleFirestoreError, OperationType } from "./firebase";
 import { UserProfile } from "../types";
+import adminAvatarImg from "../assets/images/admin_avatar_1784708968111.jpg";
 
 interface AuthContextType {
   user: User | null;
@@ -19,7 +20,7 @@ const mockUser = {
   uid: "mock-user-123",
   displayName: "Pruthvish B Shetty",
   email: "pruthvishbshetty45@gmail.com",
-  photoURL: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=150",
+  photoURL: adminAvatarImg,
   emailVerified: true,
   isAnonymous: false,
   metadata: {},

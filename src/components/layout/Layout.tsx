@@ -4,6 +4,7 @@ import { ReactNode } from 'react';
 import { USER_NAME } from '../../constants';
 import { cn } from '../../lib/utils';
 import logoImg from '../../assets/images/farmetra_logo_1780246757391.png';
+import adminAvatarImg from '../../assets/images/admin_avatar_1784708968111.jpg';
 import { useLanguage } from '../../lib/LanguageContext';
 
 interface LayoutProps {
@@ -120,8 +121,8 @@ export default function Layout({ children, activeTab, onTabChange, isDarkMode, o
             isDarkMode ? "bg-emerald-950/40 border-emerald-900/30" : "bg-[#1B4332] border-transparent"
           )}>
             <div className="flex items-center gap-3 mb-2">
-              <div className="w-8 h-8 rounded-xl bg-emerald-400 flex items-center justify-center text-emerald-900 font-extrabold text-[10px] uppercase">
-                {USER_NAME.split(' ').map(n => n[0]).join('').substring(0, 2)}
+              <div className="w-8 h-8 rounded-xl overflow-hidden shrink-0 border border-emerald-400/30">
+                <img src={adminAvatarImg} alt={USER_NAME} className="w-full h-full object-cover" />
               </div>
               <p className="text-xs font-black truncate text-white uppercase tracking-tight">{USER_NAME}</p>
             </div>
